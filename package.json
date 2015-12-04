@@ -1,0 +1,27 @@
+{
+  "name": "UrbanScope-crawler",
+  "version": "3.0.0",
+  "private": true,
+  "description": "UrbanScope crawler",
+  "scripts": {
+    "trace-crawler": "node -r memon crawler",
+    "crawler": "node crawler"
+  },
+  "author": "Volox",
+  "license": "MIT",
+  "dependencies": {
+    "@volox/social-post-wrapper": "0.x",
+    "bluebird": "3.x",
+    "co": "4.x",
+    "debug": "2.x",
+    "instagram-node": "0.5.x",
+    "lodash": "3.x",
+    "mongodb": "2.x",
+    "stream-funnel": "1.x",
+    "turf": "2.x",
+    "twit": "2.x"
+  },
+  "devDependencies": {
+    "eslint-config-volox": "*"
+  }
+}
