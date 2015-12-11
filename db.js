@@ -2,7 +2,6 @@
 // Load system modules
 
 // Load modules
-let _ = require( 'lodash' );
 let Promise = require( 'bluebird' );
 let debug = require( 'debug' )( 'DB' );
 let MongoClient = require( 'mongodb' ).MongoClient;
@@ -10,7 +9,6 @@ let MongoClient = require( 'mongodb' ).MongoClient;
 // Load my modules
 
 // Constant declaration
-const COLLECTION_INDEXES = require( './config/indexes.json' );
 const CONFIG = require( './config/mongo.json' );
 const DB_URL = CONFIG.url;
 const DB_NAME = CONFIG.name;
@@ -22,23 +20,10 @@ let db;
 // Module functions declaration
 function getCollection( name ) {
   if( db ) {
-    return db.collection( name );
+    return db.collection( COLLECTIONS[ name ] || name );
   } else {
     throw new Error( 'DB not available' );
   }
-}
-function init() {
-  debug( 'Init collections' );
-
-  let promises = _.map( COLLECTIONS, ( collectionName, key )=> {
-    let indexes = COLLECTION_INDEXES[ key ];
-    debug( 'Ensure indexes for %s(%s) ', key, collectionName, indexes );
-
-    let collection = getCollection( collectionName );
-    return collection.createIndexes( indexes );
-  } );
-
-  return Promise.all( promises );
 }
 function connect() {
   if( db ) {
@@ -57,8 +42,7 @@ function connect() {
   return MongoClient
   .connect( dbUrl, connectionOptions )
   .tap( myDB => db = myDB )
-  .tap( () => debug( 'Connection opened' ) )
-  .tap( init );
+  .tap( () => debug( 'Connection opened' ) );
 }
 function disconnect() {
   if( db ) {
@@ -72,7 +56,29 @@ function disconnect() {
 }
 
 
+function find( collectionName, filter, fields ) {
 
+  let collection = getCollection( collectionName );
+
+  return collection
+  .find( filter )
+  .project( fields );
+}
+function count( collectionName, filter ) {
+  return find( collectionName, filter )
+  .count();
+}
+function aggregate( collectionName, pipeline ) {
+
+  let collection = getCollection( collectionName );
+
+  let options = {
+    allowDiskUse: true,
+  };
+
+  return collection
+  .aggregate( pipeline, options );
+}
 
 
 
@@ -89,6 +95,10 @@ module.exports.disconnect = disconnect;
 module.exports.close = disconnect;
 module.exports.getCollection = getCollection;
 module.exports.get = getCollection;
+
+module.exports.find = find;
+module.exports.count = count;
+module.exports.aggregate = aggregate;
 
 
 //  50 6F 77 65 72 65 64  62 79  56 6F 6C 6F 78

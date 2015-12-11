@@ -1,27 +1,32 @@
 {
-  "name": "UrbanScope-crawler",
+  "name": "UrbanScope-server",
   "version": "3.0.0",
   "private": true,
-  "description": "UrbanScope crawler",
+  "description": "UrbanScope server",
   "scripts": {
-    "trace-crawler": "node -r memon crawler",
-    "crawler": "node crawler"
+    "trace-server": "node -r memon server.js",
+    "server": "node server.js",
+    "nodemon": "nodemon server.js"
   },
   "author": "Volox",
   "license": "MIT",
   "dependencies": {
-    "@volox/social-post-wrapper": "0.x",
     "bluebird": "3.x",
+    "boom": "3.x",
     "co": "4.x",
     "debug": "2.x",
-    "instagram-node": "0.5.x",
+    "koa": ">=2.0.0-alpha.3",
+    "koa-compose": "3.x",
+    "koa-router": "7.x",
+    "koa-static-cache": "3.x",
     "lodash": "3.x",
+    "mkdirp": "0.5.x",
+    "moment": "2.x",
     "mongodb": "2.x",
-    "stream-funnel": "1.x",
-    "turf": "2.x",
-    "twit": "2.x"
+    "stream-funnel": "1.x"
   },
   "devDependencies": {
-    "eslint-config-volox": "*"
+    "eslint-config-volox": "*",
+    "nodemon": "*"
   }
 }
