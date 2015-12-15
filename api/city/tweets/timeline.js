@@ -18,7 +18,7 @@ const DATE_FORMAT = require( '../../../config/' ).dateFormat;
 // Module variables declaration
 
 // Module functions declaration
-function* getTweetsPerMonth( collectionName, year, month, filter ) {
+function getTweetsPerMonth( collectionName, year, month, filter ) {
   let start = moment.utc( { year, month } ).startOf( 'month' );
   let end = moment.utc( { year, month } ).endOf( 'month' );
 
@@ -29,9 +29,7 @@ function* getTweetsPerMonth( collectionName, year, month, filter ) {
     }
   } );
 
-  let count = yield db.count( collectionName, query );
-
-  return count;
+  return db.count( collectionName, query );
 }
 function* getTimeline( ctx ) {
   debug( 'Requested timeline' );
@@ -65,7 +63,7 @@ function* getTimeline( ctx ) {
     };
   }
 
-  let timeline = [];
+  let actions = {};
 
   // For each month count the tweets
   let startDate = start.clone();
@@ -74,17 +72,17 @@ function* getTimeline( ctx ) {
     let year = startDate.year();
 
     debug( 'Get tweets count for %d-%d', year, month+1 );
-    let monthlyCount = yield getTweetsPerMonth( COLLECTION, year, month, filter );
-
-    timeline.push( {
-      date: startDate.format( 'YYYY-MM' ),
-      value: monthlyCount,
-    } );
+    let key = startDate.format( 'YYYY-MM' );
+    actions[ key ] = getTweetsPerMonth( COLLECTION, year, month, filter );
 
     startDate.add( 1, 'month' );
   }
 
-  response.timeline = timeline;
+  let responses = yield actions;
+
+  response.timeline = _.map( responses, ( count, date ) => {
+    return { date, count };
+  } );
 
 
   ctx.body = response;

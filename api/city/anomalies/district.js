@@ -5,13 +5,12 @@
 let co = require( 'co' );
 let _ = require( 'lodash' );
 let Boom = require( 'boom' );
-let debug = require( 'debug' )( 'Api:city:tweets:district' );
+let debug = require( 'debug' )( 'Api:city:anomalies:district' );
 
 // Load my modules
-let db = require( '../../../db' );
+let getAnomalies = require( '../../../utils/get-anomalies' );
 
 // Constant declaration
-const COLLECTION = 'posts';
 const DATE_FORMAT = require( '../../../config/' ).dateFormat;
 const NILS = require( '../../../config/nils.json' );
 
@@ -24,7 +23,6 @@ function* district( ctx ) {
   let start = ctx.startDate;
   let end = ctx.endDate;
   let language = ctx.language;
-  let nils = ctx.nils;
 
 
   if( start.isAfter( end ) ) {
@@ -34,7 +32,7 @@ function* district( ctx ) {
   let response = {
     startDate: start.format( DATE_FORMAT ),
     endDate: end.format( DATE_FORMAT ),
-    language: language,
+    lang: language,
   };
 
 
@@ -45,59 +43,34 @@ function* district( ctx ) {
       $gte: start.toDate(),
       $lte: end.toDate(),
     },
+    lang: { $nin: [ 'und', null ] },
+    nil: { $nin: [ NaN, null ] },
   };
 
+  // Get anomalies
+  let anomalies = yield getAnomalies( filter, language );
 
-  // Add selected nils property to the response
-  let selectedNils = [];
-  if( nils.length ) {
-    selectedNils = nils;
-  } else {
-    let allNils = _.map( NILS, 'properties.ID_NIL' );
-    selectedNils = allNils;
-  }
-
-  // Filter by language
-  filter.lang = language;
-  if( language==='other' ) {
-    filter.lang = {
-      $nin: [ 'it', 'en', 'und' ],
-    };
-  }
-
-  let actions = {};
-  for( let nil of selectedNils ) {
-    let query = _.assign( {}, filter, {
-      nil: nil,
-    } );
-
-    let action = db.find( COLLECTION, query, {
-      _id: 0,
-      lang: 1,
-    } );
-
-    actions[ nil ] = action.toArray();
-  }
-
-  // Get all posts
-  let nilData = yield actions;
-
-  nilData = _( nilData )
-  .map( ( data, nil ) => {
-    let languages = _.countBy( data, 'lang' );
-    let value = _.sum( languages );
-
-    return {
-      value: value,
-      langs: languages,
-      nil: Number( nil ),
-    };
-  } )
+  // Get above threshold
+  let above = _( anomalies )
+  .map( 'nil_id' )
   .value();
+  response.nonTransparent = above;
 
+  // Get below threshold
+  let below = _( NILS )
+  .map( 'properties.ID_NIL' )
+  .difference( above )
+  .value();
+  response.belowThreshold = below;
 
-  // response.selectedNils = selectedNils;
+  // Count by type
+  response.counts = _.countBy( anomalies, 'type' );
+
+  // Get nil anomalies
+  let nilData = _( anomalies )
+  .value();
   response.nils = nilData;
+
 
   ctx.body = response;
 }

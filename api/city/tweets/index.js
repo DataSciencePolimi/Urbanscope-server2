@@ -11,8 +11,8 @@ let endDate = require( '../../middlewares/end-date' );
 let parseNil = require( '../../middlewares/nil' );
 let language = require( '../../middlewares/language' );
 let limit = require( '../../middlewares/limit' );
-let district = require( './district_opt' );
-let timeline = require( './timeline_opt' );
+let district = require( './district' );
+let timeline = require( './timeline' );
 let text = require( './text' );
 
 // Constant declaration

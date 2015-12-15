@@ -8,12 +8,10 @@ let compose = require( 'koa-compose' );
 // Load my modules
 let startDate = require( '../../middlewares/start-date' );
 let endDate = require( '../../middlewares/end-date' );
-let parseNil = require( '../../middlewares/nil' );
 let language = require( '../../middlewares/language' );
 let limit = require( '../../middlewares/limit' );
-let district = require( './district_opt' );
-let timeline = require( './timeline_opt' );
-let text = require( './text' );
+let district = require( './district' );
+let top = require( './top' );
 
 // Constant declaration
 
@@ -32,17 +30,12 @@ let router = new Router();
 router.get( '/district', compose( [
   dates,
   language,
-  parseNil( true ),
 ] ), district );
-router.get( '/timeline', compose( [
-  dates,
-  language,
-] ), timeline );
-router.get( '/text', compose( [
+router.get( '/top', compose( [
   dates,
   limit,
-  parseNil( false ),
-] ), text );
+  language,
+] ), top );
 
 // Module exports
 module.exports = router;

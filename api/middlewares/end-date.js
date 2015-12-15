@@ -24,7 +24,7 @@ function getEndDate( ctx, next ) {
   if( end ) {
     end = moment.utc( end, DATE_FORMAT, 'en', true );
   } else {
-    end = moment.utc();
+    end = moment.utc().endOf( 'month' );
   }
 
   if( !end.isValid() ) {
