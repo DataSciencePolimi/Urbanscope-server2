@@ -4,7 +4,7 @@ let path = require( 'path' );
 
 // Load modules
 let Koa = require( 'koa' );
-var Router = require( 'koa-router' );
+let Router = require( 'koa-router' );
 let Promise = require( 'bluebird' );
 let mkdirp = require( 'mkdirp' );
 let debug = require( 'debug' )( 'Server' );
@@ -27,7 +27,7 @@ const CACHE_PATH = path.resolve( __dirname, 'cache' );
 // Module class declaration
 
 // Module initialization (at first load)
-Promise.longStackTraces();
+// Promise.longStackTraces();
 mkdirp = Promise.promisifyAll( mkdirp, { multiArgs: true } );
 
 let app = new Koa();

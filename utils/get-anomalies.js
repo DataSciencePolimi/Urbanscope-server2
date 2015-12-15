@@ -3,6 +3,7 @@
 
 // Load modules
 let _ = require( 'lodash' );
+let Promise = require( 'bluebird' );
 let debug = require( 'debug' )( 'Utils:anomalies' );
 
 // Load my modules
@@ -73,59 +74,61 @@ function getLanguage( language ) {
     return language;
   }
 }
-function getNilObject( language, data ) {
-  let nil = Number( data._id );
-  let total = data.count;
-  let languages = data.langs;
 
-  languages = _( languages )
-  .map( getLanguage )
-  .countBy()
-  .mapValues( val => val/total )
-  .value();
+function convertToNilObject( data, nil ) {
+  let languages = _.map( data, 'lang' );
 
   return {
-    value: languages[ language ] || 0,
-    nil_id: nil, //eslint-disable-line camelcase
-  };
+    nil: Number( nil ),
+    langs: languages,
+    count: languages.length,
+  }
 }
 function getAnomalies( filter, language ) {
   debug( 'Get anomalies' );
 
-  let pipeline = [];
-  // Filter
-  pipeline.push( {
-    $match: filter,
-  } );
-  // Select fields
-  pipeline.push( {
-    $project: {
+  let allNils = _.map( NILS, 'properties.ID_NIL' );
+
+  let actions = {};
+  for( let nil of allNils ) {
+    let query = _.assign( {}, filter, {
+      nil: nil,
+    } );
+
+    let action = db.find( COLLECTION, query, {
       _id: 0,
       lang: 1,
-      nil: 1,
-    },
-  } );
-  // Group by nil
-  pipeline.push( {
-    $group: {
-      _id: '$nil',
-      langs: { $push: '$lang' },
-      count: { $sum: 1 },
-    }
-  } );
-  // Filter non siutable NILS
-  pipeline.push( {
-    $match: {
-      count: { $gt: THRESHOLD },
-    }
-  } );
-  // Sort
-  pipeline.push( {
-    $sort: {
-      _id: 1,
-    }
-  } );
+    } );
 
+    actions[ nil ] = action.toArray();
+  }
+
+  // Get all posts
+  return Promise
+  .props( actions )
+  .then( data => _( data )
+    .map( convertToNilObject )
+    .filter( nilObject => nilObject.count>THRESHOLD )
+    .value()
+  )
+  .map( nilObject => {
+    let total = nilObject.count;
+
+    let languages = _( nilObject.langs )
+    .map( getLanguage )
+    .countBy()
+    .mapValues( val => val/total )
+    .value()
+
+    return {
+      nil_id: nilObject.nil, //eslint-disable-line camelcase
+      value: languages[ language ] || 0,
+    }
+  } )
+  .then( assignClass )
+  ;
+
+  /*
   let parseData = _.partial( getNilObject, language );
 
   // Get all data
@@ -138,6 +141,7 @@ function getAnomalies( filter, language ) {
     .value()
   )
   .then( assignClass );
+  */
 }
 // Module class declaration
 

@@ -44,8 +44,10 @@ function* district( ctx ) {
       $lte: end.toDate(),
     },
     lang: { $nin: [ 'und', null ] },
-    nil: { $nin: [ NaN, null ] },
+    // nil: { $nin: [ NaN, null ] },
   };
+
+  let allNils = _.map( NILS, 'properties.ID_NIL' );
 
   // Get anomalies
   let anomalies = yield getAnomalies( filter, language );
@@ -57,8 +59,7 @@ function* district( ctx ) {
   response.nonTransparent = above;
 
   // Get below threshold
-  let below = _( NILS )
-  .map( 'properties.ID_NIL' )
+  let below = _( allNils )
   .difference( above )
   .value();
   response.belowThreshold = below;
@@ -70,7 +71,6 @@ function* district( ctx ) {
   let nilData = _( anomalies )
   .value();
   response.nils = nilData;
-
 
   ctx.body = response;
 }
