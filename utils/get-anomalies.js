@@ -127,21 +127,6 @@ function getAnomalies( filter, language ) {
   } )
   .then( assignClass )
   ;
-
-  /*
-  let parseData = _.partial( getNilObject, language );
-
-  // Get all data
-  return db
-  .aggregate( COLLECTION, pipeline )
-  .toArray()
-  .then( data =>
-    _( data )
-    .map( parseData )
-    .value()
-  )
-  .then( assignClass );
-  */
 }
 // Module class declaration
 
