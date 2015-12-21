@@ -39,7 +39,8 @@ app.on( 'error', err => {
 } );
 // Middlewares
 let mainRouter = new Router();
-mainRouter.use( '/city', cityRouter.routes() );
+// mainRouter.use( '/city', cityRouter.routes() );
+mainRouter.use( cityRouter.routes() );
 
 // Enable main router
 app.use( handleErrors );

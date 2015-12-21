@@ -52,7 +52,10 @@ function* getTimeline( ctx ) {
 
   // Create query filter
   let filter = {
-    provider: 'twitter',
+    $or: [
+      { provider: 'twitter' },
+      { source: 'twitter' },
+    ],
   };
 
   // Filter by language

@@ -40,7 +40,10 @@ function* district( ctx ) {
 
   // Create query filter
   let filter = {
-    provider: 'twitter',
+    $or: [
+      { provider: 'twitter' },
+      { source: 'twitter' },
+    ],
     date: {
       $gte: start.toDate(),
       $lte: end.toDate(),
@@ -96,7 +99,7 @@ function* district( ctx ) {
   .value();
 
 
-  // response.selectedNils = selectedNils;
+  response.selectedNils = selectedNils;
   response.nils = nilData;
 
   ctx.body = response;

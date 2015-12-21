@@ -67,6 +67,8 @@ function* district( ctx ) {
   if( nils.length ) {
     response.selectedNils = nils;
     filter.nil = { $in: nils };
+  } else {
+    response.selectedNils = 'all';
   }
 
   // Get the field on which to do summations
