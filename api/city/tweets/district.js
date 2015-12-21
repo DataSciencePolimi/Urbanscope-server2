@@ -64,7 +64,7 @@ function* district( ctx ) {
   filter.lang = language;
   if( language==='other' ) {
     filter.lang = {
-      $nin: [ 'it', 'en', 'und' ],
+      $nin: [ 'it', 'en', 'und', null ],
     };
   }
 

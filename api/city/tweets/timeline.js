@@ -14,6 +14,7 @@ let db = require( '../../../db' );
 // Constant declaration
 const COLLECTION = 'posts';
 const DATE_FORMAT = require( '../../../config/' ).dateFormat;
+const OUT_DATE_FORMAT = 'YYYY-MM';
 
 // Module variables declaration
 
@@ -46,7 +47,7 @@ function* getTimeline( ctx ) {
   let response = {
     startDate: start.format( DATE_FORMAT ),
     endDate: end.format( DATE_FORMAT ),
-    language: language,
+    lang: language,
   };
 
 
@@ -56,13 +57,14 @@ function* getTimeline( ctx ) {
       { provider: 'twitter' },
       { source: 'twitter' },
     ],
+    nil: { $ne: null },
   };
 
   // Filter by language
   filter.lang = language;
   if( language==='other' ) {
     filter.lang = {
-      $nin: [ 'it', 'en', 'und' ],
+      $nin: [ 'it', 'en', 'und', null ],
     };
   }
 
@@ -75,7 +77,7 @@ function* getTimeline( ctx ) {
     let year = startDate.year();
 
     debug( 'Get tweets count for %d-%d', year, month+1 );
-    let key = startDate.format( 'YYYY-MM' );
+    let key = startDate.format( OUT_DATE_FORMAT );
     actions[ key ] = getTweetsPerMonth( COLLECTION, year, month, filter );
 
     startDate.add( 1, 'month' );
@@ -84,7 +86,10 @@ function* getTimeline( ctx ) {
   let responses = yield actions;
 
   response.timeline = _.map( responses, ( count, date ) => {
-    return { date, count };
+    return {
+      date,
+      value: count,
+    };
   } );
 
 
