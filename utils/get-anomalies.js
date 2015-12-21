@@ -98,7 +98,9 @@ function getAnomalies( filter, language ) {
     let action = db.find( COLLECTION, query, {
       _id: 0,
       lang: 1,
-    } );
+    } )
+    .hint( { nil: 1 } )
+    ;
 
     actions[ nil ] = action.toArray();
   }
