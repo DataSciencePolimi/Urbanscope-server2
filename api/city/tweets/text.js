@@ -64,6 +64,9 @@ function* getTweetsText( ctx ) {
   .sort( {
     date: -1,
   } )
+  .hint( {
+    nil: 1,
+  } )
   .toArray();
 
   response.tweets = tweets;

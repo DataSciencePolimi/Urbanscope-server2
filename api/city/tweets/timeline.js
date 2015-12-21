@@ -30,7 +30,11 @@ function getTweetsPerMonth( collectionName, year, month, filter ) {
     }
   } );
 
-  return db.count( collectionName, query );
+  return db
+  .find( collectionName, query )
+  .hint( { date: 1 } )
+  .count()
+  ;
 }
 function* getTimeline( ctx ) {
   debug( 'Requested timeline' );

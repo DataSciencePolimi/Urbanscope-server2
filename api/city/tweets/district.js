@@ -76,7 +76,9 @@ function* district( ctx ) {
       lang: 1,
     } );
 
-    actions[ nil ] = action.toArray();
+    actions[ nil ] = action
+    .hint( { nil: 1 } )
+    .toArray();
   }
 
   // Get all posts
