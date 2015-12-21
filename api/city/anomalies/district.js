@@ -38,7 +38,10 @@ function* district( ctx ) {
 
   // Create query filter
   let filter = {
-    provider: 'twitter',
+    $or: [
+      { provider: 'twitter' },
+      { source: 'twitter' },
+    ],
     date: {
       $gte: start.toDate(),
       $lte: end.toDate(),
