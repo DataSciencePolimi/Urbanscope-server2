@@ -40,16 +40,13 @@ function* district( ctx ) {
 
   // Create query filter
   let filter = {
-    $or: [
-      { provider: 'twitter' },
-      { source: 'twitter' },
-    ],
+    source: 'twitter',
     date: {
       $gte: start.toDate(),
       $lte: end.toDate(),
     },
     lang: { $nin: [ 'und', null ] },
-    nil: { $nin: [ NaN, null ] },
+    // nil: { $nin: [ NaN, null ] },
   };
 
   // Get anomalies

@@ -53,10 +53,7 @@ function* getTimeline( ctx ) {
 
   // Create query filter
   let filter = {
-    $or: [
-      { provider: 'twitter' },
-      { source: 'twitter' },
-    ],
+    source: 'twitter',
     nil: { $ne: null },
   };
 
@@ -85,12 +82,14 @@ function* getTimeline( ctx ) {
 
   let responses = yield actions;
 
-  response.timeline = _.map( responses, ( count, date ) => {
+  let timeline = _.map( responses, ( count, date ) => {
     return {
       date,
       value: count,
     };
   } );
+
+  response.timeline = timeline;
 
 
   ctx.body = response;

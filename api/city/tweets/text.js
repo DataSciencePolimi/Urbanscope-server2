@@ -3,9 +3,7 @@
 
 // Load modules
 let co = require( 'co' );
-let _ = require( 'lodash' );
 let Boom = require( 'boom' );
-let moment = require( 'moment' );
 let debug = require( 'debug' )( 'Api:city:tweets:text' );
 
 // Load my modules
@@ -18,21 +16,6 @@ const DATE_FORMAT = require( '../../../config/' ).dateFormat;
 // Module variables declaration
 
 // Module functions declaration
-function* getTweetsPerMonth( collectionName, year, month, filter ) {
-  let start = moment.utc( { year, month } ).startOf( 'month' );
-  let end = moment.utc( { year, month } ).endOf( 'month' );
-
-  let query = _.assign( {}, filter, {
-    date: {
-      $gte: start.toDate(),
-      $lte: end.toDate(),
-    }
-  } );
-
-  let count = yield db.count( collectionName, query );
-
-  return count;
-}
 function* getTweetsText( ctx ) {
   debug( 'Requested text' );
 
@@ -56,10 +39,7 @@ function* getTweetsText( ctx ) {
 
   // Create query filter
   let filter = {
-    $or: [
-      { provider: 'twitter' },
-      { source: 'twitter' },
-    ],
+    source: 'twitter',
     date: {
       $gte: start.toDate(),
       $lte: end.toDate(),
