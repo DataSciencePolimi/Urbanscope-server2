@@ -25,7 +25,7 @@ function getLimit( ctx, next ) {
 
   if( isNaN( limit ) ) {
     throw Boom.badRequest( '"limit" value is invalid' )
-  } else if( limit>0 ) {
+  } else if( limit<=0 ) {
     throw Boom.badRequest( '"limit" must be greater than 0' )
   }
 
