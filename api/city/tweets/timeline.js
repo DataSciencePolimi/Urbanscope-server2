@@ -15,6 +15,7 @@ let db = require( '../../../db' );
 const COLLECTION = 'posts';
 const DATE_FORMAT = require( '../../../config/' ).dateFormat;
 const OUT_DATE_FORMAT = 'YYYY-MM';
+const CACHE_MAX_AGE = 60*60*24*10; // 10 dd
 
 // Module variables declaration
 
@@ -37,6 +38,9 @@ function getTweetsPerMonth( collectionName, year, month, filter ) {
   ;
 }
 function* getTimeline( ctx ) {
+  // Cache MAX_AGE
+  ctx.maxAge = CACHE_MAX_AGE;
+
   debug( 'Requested timeline' );
 
   let start = ctx.startDate;

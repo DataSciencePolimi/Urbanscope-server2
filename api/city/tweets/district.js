@@ -14,11 +14,15 @@ let db = require( '../../../db' );
 const COLLECTION = 'posts';
 const DATE_FORMAT = require( '../../../config/' ).dateFormat;
 const NILS = require( '../../../config/nils.json' );
+const CACHE_MAX_AGE = 60*60*24*1; // 1 dd
 
 // Module variables declaration
 
 // Module functions declaration
 function* district( ctx ) {
+  // Cache MAX_AGE
+  ctx.maxAge = CACHE_MAX_AGE;
+
   debug( 'Requested district' );
 
   let start = ctx.startDate;

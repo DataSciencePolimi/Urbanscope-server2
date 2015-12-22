@@ -13,6 +13,7 @@ let debug = require( 'debug' )( 'Server' );
 let db = require( './db' );
 let setMetadata = require( './api/middlewares/metadata' );
 let handleErrors = require( './api/middlewares/error' );
+let cache = require( './api/middlewares/cache' );
 let cityRouter = require( './api/city/' );
 // let milanRouter = require( './api/milan/' );
 
@@ -30,6 +31,7 @@ const CACHE_PATH = path.resolve( __dirname, 'cache' );
 // Promise.longStackTraces();
 mkdirp = Promise.promisifyAll( mkdirp, { multiArgs: true } );
 
+
 let app = new Koa();
 app.name = 'UrbanScope';
 app.proxy = true;
@@ -45,6 +47,7 @@ mainRouter.use( cityRouter.routes() );
 // Enable main router
 app.use( handleErrors );
 app.use( setMetadata );
+app.use( cache() );
 app.use( mainRouter.routes() );
 
 

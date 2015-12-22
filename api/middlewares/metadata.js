@@ -28,6 +28,7 @@ function* setMetadata( ctx, next ) {
 
   let metadata = {
     completedIn: ms,
+    fromCache: ctx.cached,
   };
 
   if( !ctx.body ) {

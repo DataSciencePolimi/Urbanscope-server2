@@ -15,6 +15,7 @@
     "boom": "3.x",
     "co": "4.x",
     "debug": "2.x",
+    "ioredis": "1.x",
     "koa": ">=2.0.0-alpha.3",
     "koa-compose": "3.x",
     "koa-router": "7.x",
