@@ -3,6 +3,7 @@
 
 // Load modules
 let co = require( 'co' );
+let _ = require( 'lodash' );
 let Boom = require( 'boom' );
 let debug = require( 'debug' )( 'Api:city:tweets:text' );
 
@@ -45,10 +46,6 @@ function* getTweetsText( ctx ) {
       $lte: end.toDate(),
     },
     nil: nil,
-    // Remove the sensitive contents
-    'raw.possibly_sensitive': { $ne: true },
-    // and the retweets
-    'raw.retweeted_status': { $exists: false },
   };
 
   let tweets = yield db.find( COLLECTION, filter, {
@@ -59,15 +56,27 @@ function* getTweetsText( ctx ) {
     author: 1,
     authorId: 1,
     text: 1,
+    'raw.possibly_sensitive': 1,
+    'raw.retweeted_status': 1,
   } )
-  .limit( limit )
   .sort( {
     date: -1,
   } )
   .hint( {
     nil: 1,
   } )
+  .limit( limit+Math.round( limit/4 ) ) // Get more tweets so after the filtering we have enough
   .toArray();
+
+  debug( 'From %d tweets', tweets.length );
+  // Filter RT and sensitive content
+  tweets = _( tweets )
+  .filter( t => !t.raw.possibly_sensitive ) // Filter out sensitive content
+  .filter( t => !t.raw.retweeted_status ) // Filter out retweets
+  .take( limit ) // Keep only "limit" tweets
+  .value();
+
+  debug( 'To %d tweets', tweets.length );
 
   response.tweets = tweets;
 
