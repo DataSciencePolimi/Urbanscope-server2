@@ -5,10 +5,10 @@
 let co = require( 'co' );
 let _ = require( 'lodash' );
 let Boom = require( 'boom' );
-let debug = require( 'debug' )( 'Api:city:calls:timeline' );
+let debug = require( 'debug' )( 'UrbanScope:server:api:city:calls:timeline' );
 
 // Load my modules
-let db = require( '../../../db' );
+let db = require( 'db-utils' );
 
 // Constant declaration
 const COLLECTION = 'calls';

@@ -4,7 +4,7 @@
 // Load modules
 let co = require( 'co' );
 let Boom = require( 'boom' );
-let debug = require( 'debug' )( 'Api:middlewares:error' );
+let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:error' );
 
 // Load my modules
 

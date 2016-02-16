@@ -4,15 +4,17 @@
 // Load modules
 let co = require( 'co' );
 let Redis = require( 'ioredis' );
-let debug = require( 'debug' )( 'Api:middlewares:cache' );
+let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:cache' );
 
 // Load my modules
 
 // Constant declaration
-const MAX_AGE = 60*5; // 5 min
+const MAX_AGE = 60*30; // 5 min
 
 // Module variables declaration
-let redis = new Redis();
+let redis = new Redis( {
+  keyPrefix: 'UrbanScope:server:',
+} );
 
 // Module functions declaration
 function hashFn( ctx ) {

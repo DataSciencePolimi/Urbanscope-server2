@@ -5,7 +5,7 @@
 let co = require( 'co' );
 let _ = require( 'lodash' );
 let Boom = require( 'boom' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:city:tweets:district' );
+let debug = require( 'debug' )( 'UrbanScope:server:api:municipality:tweets:district' );
 
 // Load my modules
 let db = require( 'db-utils' );
@@ -13,7 +13,7 @@ let db = require( 'db-utils' );
 // Constant declaration
 const COLLECTION = 'posts';
 const DATE_FORMAT = require( '../../../config/' ).dateFormat;
-const NILS = require( '../../../config/milan_nils.json' );
+const MUNICIPALITIES = require( '../../../config/milan_municipalities.json' );
 const CACHE_MAX_AGE = 60*60*24*1; // 1 dd
 
 // Module variables declaration
@@ -28,7 +28,7 @@ function* district( ctx ) {
   let start = ctx.startDate;
   let end = ctx.endDate;
   let language = ctx.language;
-  let nils = ctx.nils;
+  let municipalities = ctx.municipalities;
 
 
   if( start.isAfter( end ) ) {
@@ -52,13 +52,13 @@ function* district( ctx ) {
   };
 
 
-  // Add selected nils property to the response
-  let selectedNils = [];
-  if( nils.length ) {
-    selectedNils = nils;
+  // Add selected Municipalities property to the response
+  let selectedMunicipalities = [];
+  if( municipalities.length ) {
+    selectedMunicipalities = municipalities;
   } else {
-    let allNils = _.map( NILS, 'properties.ID_NIL' );
-    selectedNils = allNils;
+    let allMunicipalities = _.map( MUNICIPALITIES, 'properties.PRO_COM' );
+    selectedMunicipalities = allMunicipalities;
   }
 
   // Filter by language
@@ -69,10 +69,12 @@ function* district( ctx ) {
     };
   }
 
+
+  // Prepare all the actions(queries) to execute so we can optimize the performance
   let actions = {};
-  for( let nil of selectedNils ) {
+  for( let municipality of selectedMunicipalities ) {
     let query = _.assign( {}, filter, {
-      nil: nil,
+      municipality: municipality,
     } );
 
     let action = db.find( COLLECTION, query, {
@@ -80,30 +82,30 @@ function* district( ctx ) {
       lang: 1,
     } );
 
-    actions[ nil ] = action
-    .hint( { nil: 1 } )
+    actions[ municipality ] = action
+    .hint( { municipality: 1 } )
     .toArray();
   }
 
   // Get all posts
-  let nilData = yield actions;
+  let municipalityData = yield actions;
 
-  nilData = _( nilData )
-  .map( ( data, nil ) => {
+  municipalityData = _( municipalityData )
+  .map( ( data, municipality ) => {
     let languages = _.countBy( data, 'lang' );
     let value = _.sum( languages );
 
     return {
       value: value,
       langs: languages,
-      nil: Number( nil ),
+      municipality: Number( municipality ),
     };
   } )
   .value();
 
 
-  response.selectedNils = selectedNils;
-  response.nils = nilData;
+  response.selectedMunicipalities = selectedMunicipalities;
+  response.municipalities = municipalityData;
 
   ctx.body = response;
 }

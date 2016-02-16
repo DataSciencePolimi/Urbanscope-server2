@@ -1,25 +1,20 @@
 'use strict';
 // Load system modules
-let path = require( 'path' );
 
 // Load modules
-let Koa = require( 'koa' );
-let Router = require( 'koa-router' );
 let Promise = require( 'bluebird' );
-let mkdirp = require( 'mkdirp' );
-let debug = require( 'debug' )( 'Server' );
+let debug = require( 'debug' )( 'UrbanScope:server' );
 
 // Load my modules
-let db = require( './db' );
-let setMetadata = require( './api/middlewares/metadata' );
-let handleErrors = require( './api/middlewares/error' );
-let cache = require( './api/middlewares/cache' );
-let cityRouter = require( './api/city/' );
-// let milanRouter = require( './api/milan/' );
+let db = require( 'db-utils' );
+let api = require( './api/' );
 
 // Constant declaration
 const CONFIG = require( './config/index.json' );
-const CACHE_PATH = path.resolve( __dirname, 'cache' );
+const MONGO = require( './config/mongo.json' );
+const COLLECTIONS = MONGO.collections;
+const DB_URL = MONGO.url;
+const DB_NAME = MONGO.name;
 
 // Module variables declaration
 
@@ -28,36 +23,14 @@ const CACHE_PATH = path.resolve( __dirname, 'cache' );
 // Module class declaration
 
 // Module initialization (at first load)
-// Promise.longStackTraces();
-mkdirp = Promise.promisifyAll( mkdirp, { multiArgs: true } );
-
-
-let app = new Koa();
-app.name = 'UrbanScope';
-app.proxy = true;
-
-app.on( 'error', err => {
-  debug( 'Server error', err, err.stack );
-} );
-// Middlewares
-let mainRouter = new Router();
-// mainRouter.use( '/city', cityRouter.routes() );
-mainRouter.use( cityRouter.routes() );
-
-// Enable main router
-app.use( handleErrors );
-app.use( setMetadata );
-app.use( cache() );
-app.use( mainRouter.routes() );
-
+db.mapping = COLLECTIONS
 
 // Entry point
-mkdirp.mkdirpAsync( CACHE_PATH )
-.then( db.open )
+db.open( DB_URL, DB_NAME )
 .then( ()=> {
-  debug( 'App started' );
+  debug( 'DB ready, stat webserver' );
 
-  app.listen( CONFIG.port );
+  api.listen( CONFIG.port );
   debug( 'Server ready on port %d', CONFIG.port );
 } )
 

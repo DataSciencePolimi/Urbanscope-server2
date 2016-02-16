@@ -6,10 +6,10 @@ let co = require( 'co' );
 let _ = require( 'lodash' );
 let Boom = require( 'boom' );
 let moment = require( 'moment' );
-let debug = require( 'debug' )( 'Api:city:calls:list' );
+let debug = require( 'debug' )( 'UrbanScope:server:api:city:calls:list' );
 
 // Load my modules
-let db = require( '../../../db' );
+let db = require( 'db-utils' );
 
 // Constant declaration
 const COLLECTION = 'calls';

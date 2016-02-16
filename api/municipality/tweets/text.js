@@ -5,7 +5,7 @@
 let co = require( 'co' );
 let _ = require( 'lodash' );
 let Boom = require( 'boom' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:city:tweets:text' );
+let debug = require( 'debug' )( 'UrbanScope:server:api:municipality:tweets:text' );
 
 // Load my modules
 let db = require( 'db-utils' );
@@ -28,7 +28,7 @@ function* getTweetsText( ctx ) {
   let start = ctx.startDate;
   let end = ctx.endDate;
   let limit = ctx.limit;
-  let nil = ctx.nil;
+  let municipality = ctx.municipality;
 
 
   if( start.isAfter( end ) ) {
@@ -38,7 +38,7 @@ function* getTweetsText( ctx ) {
   let response = {
     startDate: start.format( DATE_FORMAT ),
     endDate: end.format( DATE_FORMAT ),
-    nil: nil,
+    municipality: municipality,
     lang: lang,
     limit: limit,
   };
@@ -52,7 +52,7 @@ function* getTweetsText( ctx ) {
       $lte: end.toDate(),
     },
     lang: lang,
-    nil: nil,
+    municipality: municipality,
   };
 
   if( lang==='other' ) {
@@ -78,12 +78,13 @@ function* getTweetsText( ctx ) {
     date: -1,
   } )
   .hint( {
-    nil: 1,
+    municipality: 1,
   } )
   .limit( limit+Math.round( limit/4 ) ) // Get more tweets so after the filtering we have enough
   .toArray();
 
   debug( 'From %d tweets', tweets.length );
+
   // Filter RT and sensitive content
   tweets = _( tweets )
   .filter( t => !t.raw.possibly_sensitive ) // Filter out sensitive content

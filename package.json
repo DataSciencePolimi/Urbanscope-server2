@@ -4,7 +4,7 @@
   "private": true,
   "description": "UrbanScope server",
   "scripts": {
-    "trace-server": "node -r memon server.js",
+    "test": "mocha --recursive",
     "server": "node server.js",
     "nodemon": "nodemon server.js"
   },
@@ -14,20 +14,23 @@
     "bluebird": "3.x",
     "boom": "3.x",
     "co": "4.x",
+    "db-utils": "volox/node-db-utils",
     "debug": "2.x",
     "ioredis": "1.x",
-    "koa": ">=2.0.0-alpha.3",
+    "koa": "^2.0.0-alpha.3",
     "koa-compose": "3.x",
     "koa-router": "7.x",
-    "koa-static-cache": "3.x",
-    "lodash": "3.x",
+    "lodash": "4.x",
     "mkdirp": "0.5.x",
     "moment": "2.x",
     "mongodb": "2.x",
     "stream-funnel": "1.x"
   },
   "devDependencies": {
+    "chai": "3.x",
     "eslint-config-volox": "*",
-    "nodemon": "*"
+    "mocha": "2.x",
+    "nodemon": "*",
+    "supertest": "1.x"
   }
 }

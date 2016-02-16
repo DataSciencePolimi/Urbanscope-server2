@@ -3,7 +3,7 @@
 
 // Load modules
 let co = require( 'co' );
-let debug = require( 'debug' )( 'Api:middlewares:metadata' );
+let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:metadata' );
 
 // Load my modules
 

@@ -1,0 +1,56 @@
+[
+  {
+      "id" : "595986547041775617",
+      "text" : "Test",
+      "date" : "2015-05-06T16:20:40.000Z",
+      "location" : {
+          "type" : "Point",
+          "coordinates" : [
+              9.1631878199999992,
+              45.4608397699999998
+          ]
+      },
+      "author" : "AielloFabrizio",
+      "authorId" : "432014886",
+      "tags" : [],
+      "lang" : "it",
+      "nil" : 51,
+      "source" : "twitter"
+  },
+  {
+      "id" : "595986647041775618",
+      "text" : "Test",
+      "date" : "2015-05-06T16:50:40.000Z",
+      "location" : {
+          "type" : "Point",
+          "coordinates" : [
+              9.1631878199999992,
+              45.4608397699999998
+          ]
+      },
+      "author" : "AielloFabrizio111",
+      "authorId" : "432014886",
+      "tags" : [ "milano" ],
+      "lang" : "en",
+      "nil" : 1,
+      "source" : "twitter"
+  },
+  {
+      "id" : "595986647041775617",
+      "text" : "Test",
+      "date" : "2015-05-06T16:50:40.000Z",
+      "location" : {
+          "type" : "Point",
+          "coordinates" : [
+              9.1631878199999992,
+              45.4608397699999998
+          ]
+      },
+      "author" : "AielloFabrizio111",
+      "authorId" : "432014886",
+      "tags" : [ "milano" ],
+      "lang" : "fr",
+      "nil" : 1,
+      "source" : "twitter"
+  }
+]

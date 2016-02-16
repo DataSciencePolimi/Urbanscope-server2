@@ -5,7 +5,6 @@
 let Router = require( 'koa-router' );
 
 // Load my modules
-let calls = require( './calls' );
 let tweets = require( './tweets' );
 let anomalies = require( './anomalies' );
 
@@ -20,7 +19,6 @@ let anomalies = require( './anomalies' );
 // Module initialization (at first load)
 let router = new Router();
 router.use( '/tweets', tweets.routes() );
-router.use( '/calls', calls.routes() );
 router.use( '/anomaly', anomalies.routes() );
 
 // Module exports

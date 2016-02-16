@@ -5,14 +5,14 @@
 let co = require( 'co' );
 let _ = require( 'lodash' );
 let Boom = require( 'boom' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:city:anomalies:district' );
+let debug = require( 'debug' )( 'UrbanScope:server:api:municipality:anomalies:district' );
 
 // Load my modules
 let getAnomalies = require( '../../../utils/get-anomalies' );
 
 // Constant declaration
 const DATE_FORMAT = require( '../../../config/' ).dateFormat;
-const NILS = require( '../../../config/milan_nils.json' );
+const MUNICIPALITIES = require( '../../../config/milan_municipalities.json' );
 const CACHE_MAX_AGE = 60*60*24*90; // 90 dd
 
 // Module variables declaration
@@ -51,19 +51,19 @@ function* district( ctx ) {
     // nil: { $nin: [ NaN, null ] },
   };
 
-  let allNils = _.map( NILS, 'properties.ID_NIL' );
+  let allMunicipalities = _.map( MUNICIPALITIES, 'properties.PRO_COM' );
 
   // Get anomalies
-  let anomalies = yield getAnomalies( filter, language, 'nil' );
+  let anomalies = yield getAnomalies( filter, language, 'municipality' );
 
   // Get above threshold
   let above = _( anomalies )
-  .map( 'nil_id' )
+  .map( 'municipality_id' )
   .value();
   response.nonTransparent = above;
 
   // Get below threshold
-  let below = _( allNils )
+  let below = _( allMunicipalities )
   .difference( above )
   .value();
   response.belowThreshold = below;
@@ -71,10 +71,10 @@ function* district( ctx ) {
   // Count by type
   response.counts = _.countBy( anomalies, 'type' );
 
-  // Get nil anomalies
-  let nilData = _( anomalies )
+  // Get province anomalies
+  let provinceData = _( anomalies )
   .value();
-  response.nils = nilData;
+  response.provinces = provinceData;
 
   ctx.body = response;
 }

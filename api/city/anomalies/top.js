@@ -5,14 +5,14 @@
 let co = require( 'co' );
 let _ = require( 'lodash' );
 let Boom = require( 'boom' );
-let debug = require( 'debug' )( 'Api:city:anomalies:top' );
+let debug = require( 'debug' )( 'UrbanScope:server:api:city:anomalies:top' );
 
 // Load my modules
 let getAnomalies = require( '../../../utils/get-anomalies' );
 
 // Constant declaration
 const DATE_FORMAT = require( '../../../config/' ).dateFormat;
-const NILS = require( '../../../config/nils.json' );
+const NILS = require( '../../../config/milan_nils.json' );
 const CACHE_MAX_AGE = 60*60*24*90; // 90 dd
 
 // Module variables declaration
@@ -54,7 +54,7 @@ function* district( ctx ) {
   };
 
   // Get anomalies
-  let anomalies = yield getAnomalies( filter, language );
+  let anomalies = yield getAnomalies( filter, language, 'nil' );
 
   // Get above threshold
   let above = _( anomalies )
@@ -74,7 +74,7 @@ function* district( ctx ) {
 
   // Get nil anomalies
   let top = _( anomalies )
-  .sortByOrder( 'value', 'desc' )
+  .orderBy( 'value', 'desc' )
   .take( limit )
   .value();
   response.top = top;

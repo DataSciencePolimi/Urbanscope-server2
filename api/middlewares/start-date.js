@@ -4,7 +4,7 @@
 // Load modules
 let Boom = require( 'boom' );
 let moment = require( 'moment' );
-let debug = require( 'debug' )( 'Api:middlewares:start-date' );
+let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:start-date' );
 
 // Load my modules
 

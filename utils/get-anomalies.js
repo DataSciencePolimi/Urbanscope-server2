@@ -4,14 +4,15 @@
 // Load modules
 let _ = require( 'lodash' );
 let Promise = require( 'bluebird' );
-let debug = require( 'debug' )( 'Utils:anomalies' );
+let debug = require( 'debug' )( 'UrbanScope:utils:anomalies' );
 
 // Load my modules
-let db = require( '../db' );
+let db = require( 'db-utils' );
 
 // Constant declaration
 const COLLECTION = 'posts';
-const NILS = require( '../config/nils.json' );
+const NILS = require( '../config/milan_nils.json' );
+const MUNICIPALITIES = require( '../config/milan_municipalities.json' );
 const THRESHOLD = 100;
 
 // Module variables declaration
@@ -75,55 +76,62 @@ function getLanguage( language ) {
   }
 }
 
-function convertToNilObject( data, nil ) {
+function convertToObject( property, data, id ) {
   let languages = _.map( data, 'lang' );
 
   return {
-    nil: Number( nil ),
+    [property]: Number( id ),
     langs: languages,
     count: languages.length,
   }
 }
-function getAnomalies( filter, language ) {
-  debug( 'Get anomalies' );
+function getAnomalies( filter, language, type ) {
+  debug( 'Get anomalies for %s', type );
 
-  let allNils = _.map( NILS, 'properties.ID_NIL' );
+  let all = [];
+  if( type==='nil' ) {
+    all = _.map( NILS, 'properties.ID_NIL' );
+  } else if( type==='municipality' ) {
+    all = _.map( MUNICIPALITIES, 'properties.PRO_COM' );
+  } else {
+    throw new Error( `Type "${type}" not recognized as valid` );
+  }
 
   let actions = {};
-  for( let nil of allNils ) {
+  for( let id of all ) {
     let query = _.assign( {}, filter, {
-      nil: nil,
+      [type]: id,
     } );
 
     let action = db.find( COLLECTION, query, {
       _id: 0,
       lang: 1,
     } )
-    .hint( { nil: 1 } )
+    .hint( { [type]: 1 } )
     ;
 
-    actions[ nil ] = action.toArray();
+    actions[ id ] = action.toArray();
   }
 
   // Get all posts
   return Promise
   .props( actions )
   .then( data => _( data )
-    .map( convertToNilObject )
-    .filter( nilObject => nilObject.count>THRESHOLD )
+    .map( _.partial( convertToObject, type ) )
+    .filter( o => o.count>THRESHOLD )
     .value()
   )
-  .map( nilObject => {
-    let total = nilObject.count;
+  .map( o => {
+    let total = o.count;
 
-    let languages = _( nilObject.langs )
+    let languages = _( o.langs )
     .map( getLanguage )
     .countBy()
     .mapValues( val => val/total )
     .value()
 
     return {
-      nil_id: nilObject.nil, //eslint-disable-line camelcase
+      [ type+'_id' ]: o[ type ],
       value: languages[ language ] || 0,
     }
   } )

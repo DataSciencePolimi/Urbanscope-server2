@@ -4,7 +4,7 @@
 // Load modules
 let Boom = require( 'boom' );
 let _ = require( 'lodash' );
-let debug = require( 'debug' )( 'Api:middlewares:language' );
+let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:language' );
 
 // Load my modules
 

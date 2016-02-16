@@ -3,7 +3,7 @@
 
 // Load modules
 let Boom = require( 'boom' );
-let debug = require( 'debug' )( 'Api:middlewares:limit' );
+let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:limit' );
 
 // Load my modules
 

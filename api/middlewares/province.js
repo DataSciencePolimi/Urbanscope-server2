@@ -2,15 +2,12 @@
 // Load system modules
 
 // Load modules
-let _ = require( 'lodash' );
 let Boom = require( 'boom' );
 let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:nils' );
 
 // Load my modules
 
 // Constant declaration
-const NILS = require( '../../config/milan_nils.json' );
-const DEFAULT_NIL = _( NILS ).map( 'properties.ID_NIL' ).first();
 
 // Module variables declaration
 
@@ -51,7 +48,7 @@ function getNils( ctx, next ) {
 function getNil( ctx, next ) {
   debug( 'Get nil' );
 
-  let nil = getParam( ctx ) || DEFAULT_NIL;
+  let nil = getParam( ctx ) || 1;
 
   ctx.nil = Number( nil );
 
