@@ -2,9 +2,10 @@
 // Load system modules
 
 // Load modules
-let Koa = require( 'koa' );
-let Router = require( 'koa-router' );
-let debug = require( 'debug' )( 'UrbanScope:server:api' );
+const Koa = require( 'koa' );
+const Router = require( 'koa-router' );
+const helmet = require( 'koa-helmet' );
+const debug = require( 'debug' )( 'UrbanScope:server:api' );
 
 // Load my modules
 let setMetadata = require( './middlewares/metadata' );
@@ -31,15 +32,19 @@ app.on( 'error', err => {
 } );
 // Middlewares
 let mainRouter = new Router();
-mainRouter.use( '/city', cityRouter.routes() );
-mainRouter.use( '/municipality', municipalityRouter.routes() );
+if( app.env==='production' ) {
+  mainRouter.use( helmet() );
+  mainRouter.use( setMetadata );
+  mainRouter.use( '/city', cache(), cityRouter.routes() );
+  mainRouter.use( '/municipality', cache(), municipalityRouter.routes() );
+} else {
+  mainRouter.use( setMetadata );
+  mainRouter.use( '/city', cityRouter.routes() );
+  mainRouter.use( '/municipality', municipalityRouter.routes() );
+}
 
 // Enable main router
 app.use( handleErrors );
-app.use( setMetadata );
-if( process.env.NODE_ENV!=='test' ) {
-  app.use( cache() );
-}
 app.use( mainRouter.routes() );
 
 
