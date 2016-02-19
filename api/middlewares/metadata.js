@@ -6,6 +6,7 @@ let co = require( 'co' );
 let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:metadata' );
 
 // Load my modules
+let getTime = require( '../../utils/time' );
 
 // Constant declaration
 
@@ -15,27 +16,27 @@ let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:metadata' );
 function* setMetadata( ctx, next ) {
   debug( 'Set request metadata' );
 
+  ctx.metadata = {};
+
   // Init time
-  let start = Date.now();
+  let start = getTime();
 
   // Wait for all to complete
   yield next();
   debug( 'After all' );
 
   // Get request time
-  let ms = Date.now() - start;
+  let ms = getTime( start );
   debug( '%s took %d ms', ctx.path, ms );
 
-  let metadata = {
-    completedIn: ms,
-    fromCache: ctx.cached,
-  };
+  ctx.metadata.completedIn = ms;
+  ctx.metadata.fromCache = ctx.cached;
 
   if( !ctx.body ) {
     ctx.body = {};
   }
 
-  ctx.body.metadata = metadata;
+  ctx.body.metadata = ctx.metadata;
 }
 // Module class declaration
 

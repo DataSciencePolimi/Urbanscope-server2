@@ -5,10 +5,11 @@
 let co = require( 'co' );
 let _ = require( 'lodash' );
 let Boom = require( 'boom' );
+let db = require( 'db-utils' );
 let debug = require( 'debug' )( 'UrbanScope:server:api:city:tweets:text' );
 
 // Load my modules
-let db = require( 'db-utils' );
+let getTime = require( '../../../utils/time' );
 
 // Constant declaration
 const COLLECTION = 'posts';
@@ -63,6 +64,8 @@ function* getTweetsText( ctx ) {
 
   debug( 'Filter: %j', filter );
 
+  debug( 'Requesting tweets' );
+  let startTime = getTime();
   let tweets = yield db.find( COLLECTION, filter, {
     _id: 0,
     id: 1,
@@ -82,6 +85,14 @@ function* getTweetsText( ctx ) {
   } )
   .limit( limit+Math.round( limit/4 ) ) // Get more tweets so after the filtering we have enough
   .toArray();
+  let ms = getTime( startTime );
+  ctx.metadata.query = ms;
+  debug( 'Requesting tweets COMPLETED in %d ms', ms );
+
+
+
+  debug( 'Data elaboration' );
+  startTime = getTime();
 
   debug( 'From %d tweets', tweets.length );
   // Filter RT and sensitive content
@@ -92,9 +103,14 @@ function* getTweetsText( ctx ) {
   .value();
 
   debug( 'To %d tweets', tweets.length );
-
   response.tweets = tweets;
 
+
+  ms = getTime( startTime );
+  ctx.metadata.elaboration = ms;
+  debug( 'Data elaboration COMPLETED in %d ms', ms );
+
+  // Set response
   ctx.body = response;
 }
 // Module class declaration

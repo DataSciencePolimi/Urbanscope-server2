@@ -3,11 +3,12 @@
 
 // Load modules
 let _ = require( 'lodash' );
+let db = require( 'db-utils' );
 let Promise = require( 'bluebird' );
 let debug = require( 'debug' )( 'UrbanScope:utils:anomalies' );
 
 // Load my modules
-let db = require( 'db-utils' );
+let getTime = require( './time' );
 
 // Constant declaration
 const COLLECTION = 'posts';
@@ -85,7 +86,28 @@ function convertToObject( property, data, id ) {
     count: languages.length,
   }
 }
-function getAnomalies( filter, language, type ) {
+function getData( type, id, filter, times ) {
+  let query = _.assign( {}, filter, {
+    [type]: id,
+  } );
+
+  debug( 'Requesting data for %s[%s]', type, id );
+  let startTime = getTime();
+  return db.find( COLLECTION, query, {
+    _id: 0,
+    lang: 1,
+  } )
+  .hint( {
+    [type]: 1
+  } )
+  .toArray()
+  .tap( () => {
+    let ms = getTime( startTime );
+    times[ id ] = ms;
+    debug( 'Requesting data for %s[%s] COMPLETED in %d ms', type, id, ms );
+  } );
+}
+function getAnomalies( filter, language, type, profile ) {
   debug( 'Get anomalies for %s', type );
 
   let all = [];
@@ -98,24 +120,27 @@ function getAnomalies( filter, language, type ) {
   }
 
   let actions = {};
+  let times = {};
   for( let id of all ) {
-    let query = _.assign( {}, filter, {
-      [type]: id,
-    } );
-
-    let action = db.find( COLLECTION, query, {
-      _id: 0,
-      lang: 1,
-    } )
-    .hint( { [type]: 1 } )
-    ;
-
-    actions[ id ] = action.toArray();
+    actions[ id ] = getData( type, id, filter, times );
   }
+  profile[ type ] = times;
 
+
+  debug( 'Requesting actions' );
+  let queryTime = getTime();
+  let elaborationTime;
   // Get all posts
   return Promise
   .props( actions )
+  .tap( () => {
+    let ms = getTime( queryTime );
+    profile.query = ms;
+    debug( 'Requesting actions COMPLETED in %d ms', ms );
+
+    debug( 'Data elaboration' );
+    elaborationTime = getTime();
+  } )
   .then( data => _( data )
     .map( _.partial( convertToObject, type ) )
     .filter( o => o.count>THRESHOLD )
@@ -136,6 +161,11 @@ function getAnomalies( filter, language, type ) {
     }
   } )
   .then( assignClass )
+  .tap( () => {
+    let ms = getTime( elaborationTime );
+    profile.elaboration = ms;
+    debug( 'Data elaboration COMPLETED in %d ms', ms );
+  } )
   ;
 }
 // Module class declaration

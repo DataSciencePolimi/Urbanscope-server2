@@ -5,10 +5,11 @@
 let co = require( 'co' );
 let _ = require( 'lodash' );
 let Boom = require( 'boom' );
+let db = require( 'db-utils' );
 let debug = require( 'debug' )( 'UrbanScope:server:api:city:tweets:district' );
 
 // Load my modules
-let db = require( 'db-utils' );
+let getTime = require( '../../../utils/time' );
 
 // Constant declaration
 const COLLECTION = 'posts';
@@ -19,6 +20,28 @@ const CACHE_MAX_AGE = 60*60*24*1; // 1 dd
 // Module variables declaration
 
 // Module functions declaration
+function getAction( nil, filter, nilQueryTimes ) {
+  let query = _.assign( {}, filter, {
+    nil: nil,
+  } );
+
+  let action = db.find( COLLECTION, query, {
+    _id: 0,
+    lang: 1,
+  } );
+
+  debug( 'Requesting actions for nil %d', nil );
+  let startTime = getTime();
+  return action
+  .hint( { nil: 1 } )
+  .toArray()
+  .tap( ()=> {
+    let ms = getTime( startTime );
+    nilQueryTimes[ nil ] = ms;
+    debug( 'Nil %d action COMPLETED in %d ms', nil, ms )
+  } );
+}
+
 function* district( ctx ) {
   // Cache MAX_AGE
   ctx.maxAge = CACHE_MAX_AGE;
@@ -69,25 +92,26 @@ function* district( ctx ) {
     };
   }
 
+  // Start the query "actions"
   let actions = {};
+  let nilQueryTimes = {};
   for( let nil of selectedNils ) {
-    let query = _.assign( {}, filter, {
-      nil: nil,
-    } );
-
-    let action = db.find( COLLECTION, query, {
-      _id: 0,
-      lang: 1,
-    } );
-
-    actions[ nil ] = action
-    .hint( { nil: 1 } )
-    .toArray();
+    actions[ nil ] = getAction( nil, filter, nilQueryTimes );
   }
+  ctx.metadata.nilQueryTimes = nilQueryTimes;
 
   // Get all posts
+  debug( 'Requesting actions' );
+  let startTime = getTime();
   let nilData = yield actions;
+  let ms = getTime( startTime );
+  ctx.metadata.query = ms;
+  debug( 'Requesting actions COMPLETED in %d ms', ms );
 
+
+  // Make some data manipulation
+  debug( 'Data elaboration' );
+  startTime = getTime();
   nilData = _( nilData )
   .map( ( data, nil ) => {
     let languages = _.countBy( data, 'lang' );
@@ -100,11 +124,15 @@ function* district( ctx ) {
     };
   } )
   .value();
-
-
   response.selectedNils = selectedNils;
   response.nils = nilData;
 
+
+  ms = getTime( startTime );
+  ctx.metadata.elaboration = ms;
+  debug( 'Data elaboration COMPLETED in %d ms', ms );
+
+  // Set response
   ctx.body = response;
 }
 // Module class declaration

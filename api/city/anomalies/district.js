@@ -9,6 +9,7 @@ let debug = require( 'debug' )( 'UrbanScope:server:api:city:anomalies:district' 
 
 // Load my modules
 let getAnomalies = require( '../../../utils/get-anomalies' );
+let getTime = require( '../../../utils/time' );
 
 // Constant declaration
 const DATE_FORMAT = require( '../../../config/' ).dateFormat;
@@ -54,7 +55,18 @@ function* district( ctx ) {
   let allNils = _.map( NILS, 'properties.ID_NIL' );
 
   // Get anomalies
-  let anomalies = yield getAnomalies( filter, language, 'nil' );
+  debug( 'Requesting anomalies' );
+  let anomalyTimes = {};
+  let startTime = getTime();
+  let anomalies = yield getAnomalies( filter, language, 'nil', anomalyTimes );
+  let ms = getTime( startTime );
+  ctx.metadata.anomalies = anomalyTimes;
+  ctx.metadata.query = ms;
+  debug( 'Requesting anomalies COMPLETED in %d ms', ms );
+
+
+  debug( 'Data elaboration' );
+  startTime = getTime();
 
   // Get above threshold
   let above = _( anomalies )
@@ -76,6 +88,12 @@ function* district( ctx ) {
   .value();
   response.nils = nilData;
 
+
+  ms = getTime( startTime );
+  ctx.metadata.elaboration = ms;
+  debug( 'Data elaboration COMPLETED in %d ms', ms );
+
+  // Set response
   ctx.body = response;
 }
 // Module class declaration
