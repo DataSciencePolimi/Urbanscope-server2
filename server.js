@@ -28,7 +28,7 @@ db.mapping = COLLECTIONS
 // Entry point
 db.open( DB_URL, DB_NAME )
 .then( ()=> {
-  debug( 'DB ready, stat webserver' );
+  debug( 'DB ready, starting webserver' );
 
   api.listen( CONFIG.port );
   debug( 'Server ready on port %d', CONFIG.port );
