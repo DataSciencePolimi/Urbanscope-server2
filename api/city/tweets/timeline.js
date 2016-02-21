@@ -36,7 +36,7 @@ function getTweetsPerMonth( collectionName, year, month, filter, monthQueryTimes
   let startTime = getTime();
   return db
   .find( collectionName, query )
-  .hint( { date: 1 } )
+  .hint( 'date_1' )
   .count()
   .tap( ()=> {
     let ms = getTime( startTime );

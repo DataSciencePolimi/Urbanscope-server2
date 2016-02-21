@@ -97,9 +97,7 @@ function getData( type, id, filter, times ) {
     _id: 0,
     lang: 1,
   } )
-  .hint( {
-    [type]: 1
-  } )
+  .hint( `lang_${type}_1` )
   .toArray()
   .tap( () => {
     let ms = getTime( startTime );

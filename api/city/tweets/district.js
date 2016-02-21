@@ -33,7 +33,7 @@ function getAction( nil, filter, nilQueryTimes ) {
   debug( 'Requesting actions for nil %d', nil );
   let startTime = getTime();
   return action
-  .hint( { nil: 1 } )
+  .hint( 'lang_nil_1' )
   .toArray()
   .tap( ()=> {
     let ms = getTime( startTime );
