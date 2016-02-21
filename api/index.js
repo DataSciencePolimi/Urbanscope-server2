@@ -19,33 +19,68 @@ let municipalityRouter = require( './municipality/' );
 // Module variables declaration
 
 // Module functions declaration
+function addHelmet( router ) {
+  // Secure endpoint
+  // router.use( helmet.csp() );
+  // router.use( helmet.dnsPrefetchControl() );
+  // router.use( helmet.noCache() );
+  // router.use( helmet.publicKeyPins() );
+  // router.use( helmet.hsts() ); // Use HTTPS :(
+  // router.use( helmet.frameguard() );
+  // router.use( helmet.hidePoweredBy() );
+  // router.use( helmet.ieNoOpen() );
+  // router.use( helmet.noSniff() );
+  // router.use( helmet.xssFilter() );
+}
+function addRouterMiddelwares( router ) {
+  addHelmet( router );
+  // Add metadata to the request
+  router.use( setMetadata );
 
+  // Enable cache or not
+  if( process.env.NODE_ENV==='production' ) {
+    router.use( '/city', cache(), cityRouter.routes() );
+    router.use( '/municipality', cache(), municipalityRouter.routes() );
+  } else {
+    router.use( '/city', cityRouter.routes() );
+    router.use( '/municipality', municipalityRouter.routes() );
+  }
+
+}
+function addAppMiddelwares( app ) {
+  // Enable main router
+  app.use( handleErrors );
+}
+function initRouter() {
+  let router = new Router();
+  addRouterMiddelwares( router );
+
+  return router;
+}
+function initApplication() {
+  let app = new Koa();
+  app.name = 'UrbanScope';
+  app.proxy = true;
+
+  app.on( 'error', err => {
+    debug( 'Server error', err, err.stack );
+  } );
+  addAppMiddelwares( app );
+
+  // Create router
+  let router = initRouter();
+
+  // Enable router
+  app.use( router.routes() );
+
+  return app;
+}
 // Module class declaration
 
 // Module initialization (at first load)
-let app = new Koa();
-app.name = 'UrbanScope';
-app.proxy = true;
+let app = initApplication();
 
-app.on( 'error', err => {
-  debug( 'Server error', err, err.stack );
-} );
-// Middlewares
-let mainRouter = new Router();
-if( app.env==='production' ) {
-  mainRouter.use( helmet() );
-  mainRouter.use( setMetadata );
-  mainRouter.use( '/city', cache(), cityRouter.routes() );
-  mainRouter.use( '/municipality', cache(), municipalityRouter.routes() );
-} else {
-  mainRouter.use( setMetadata );
-  mainRouter.use( '/city', cityRouter.routes() );
-  mainRouter.use( '/municipality', municipalityRouter.routes() );
-}
 
-// Enable main router
-app.use( handleErrors );
-app.use( mainRouter.routes() );
 
 
 // Module exports
