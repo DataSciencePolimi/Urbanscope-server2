@@ -48,9 +48,9 @@ function* getTweetsText( ctx ) {
   // Create query filter
   let filter = {
     source: 'twitter',
-    date: {
-      $gte: start.toDate(),
-      $lte: end.toDate(),
+    timstamp: {
+      $gte: start.toDate().getTime(),
+      $lte: end.toDate().getTime(),
     },
     lang: lang,
     nil: nil,
@@ -80,9 +80,7 @@ function* getTweetsText( ctx ) {
   .sort( {
     date: -1,
   } )
-  .hint( {
-    nil: 1,
-  } )
+  .hint( 'LanguageNil' )
   .limit( limit+Math.round( limit/4 ) ) // Get more tweets so after the filtering we have enough
   .toArray();
   let ms = getTime( startTime );

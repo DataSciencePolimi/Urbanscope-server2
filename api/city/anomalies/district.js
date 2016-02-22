@@ -44,9 +44,9 @@ function* district( ctx ) {
   // Create query filter
   let filter = {
     source: 'twitter',
-    date: {
-      $gte: start.toDate(),
-      $lte: end.toDate(),
+    timstamp: {
+      $gte: start.toDate().getTime(),
+      $lte: end.toDate().getTime(),
     },
     lang: { $nin: [ 'und', null ] },
     // nil: { $nin: [ NaN, null ] },

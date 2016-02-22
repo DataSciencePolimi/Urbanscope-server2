@@ -14,6 +14,10 @@ let getTime = require( './time' );
 const COLLECTION = 'posts';
 const NILS = require( '../config/milan_nils.json' );
 const MUNICIPALITIES = require( '../config/milan_municipalities.json' );
+const indexMap = {
+  nil: 'NIL',
+  municipality: 'Municipality',
+};
 const THRESHOLD = 100;
 
 // Module variables declaration
@@ -87,6 +91,8 @@ function convertToObject( property, data, id ) {
   }
 }
 function getData( type, id, filter, times ) {
+  let indexHint = indexMap[ type ];
+
   let query = _.assign( {}, filter, {
     [type]: id,
   } );
@@ -97,7 +103,7 @@ function getData( type, id, filter, times ) {
     _id: 0,
     lang: 1,
   } )
-  .hint( `lang_${type}_1` )
+  .hint( indexHint )
   .toArray()
   .tap( () => {
     let ms = getTime( startTime );

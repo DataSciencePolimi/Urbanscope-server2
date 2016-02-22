@@ -26,9 +26,9 @@ function getTweetsPerMonth( collectionName, year, month, filter, monthQueryTimes
   let end = moment.utc( { year, month } ).endOf( 'month' );
 
   let query = _.assign( {}, filter, {
-    date: {
-      $gte: start.toDate(),
-      $lte: end.toDate(),
+    timestamp: {
+      $gte: start.toDate().getTime(),
+      $lte: end.toDate().getTime(),
     }
   } );
 
@@ -36,7 +36,7 @@ function getTweetsPerMonth( collectionName, year, month, filter, monthQueryTimes
   let startTime = getTime();
   return db
   .find( collectionName, query )
-  .hint( 'date_1' )
+  .hint( 'Timestamp' )
   .count()
   .tap( ()=> {
     let ms = getTime( startTime );

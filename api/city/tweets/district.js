@@ -33,7 +33,7 @@ function getAction( nil, filter, nilQueryTimes ) {
   debug( 'Requesting actions for nil %d', nil );
   let startTime = getTime();
   return action
-  .hint( 'lang_nil_1' )
+  .hint( 'LanguageNil' )
   .toArray()
   .tap( ()=> {
     let ms = getTime( startTime );
@@ -68,9 +68,9 @@ function* district( ctx ) {
   // Create query filter
   let filter = {
     source: 'twitter',
-    date: {
-      $gte: start.toDate(),
-      $lte: end.toDate(),
+    timstamp: {
+      $gte: start.toDate().getTime(),
+      $lte: end.toDate().getTime(),
     },
   };
 
