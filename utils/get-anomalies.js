@@ -97,6 +97,7 @@ function getData( type, id, filter, times ) {
     [type]: id,
   } );
 
+
   debug( 'Requesting data for %s[%s]', type, id );
   let startTime = getTime();
   return db.find( COLLECTION, query, {
