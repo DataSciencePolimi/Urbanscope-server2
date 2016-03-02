@@ -13,12 +13,17 @@ const runSequence = require( 'run-sequence' );
 // Load my modules
 
 // Constant declaration
+const DEPLOY_PORT = 8083;
 const DEPLOY_DATABASE = 'urbanscopejs';
 const DEPLOY_USERNAME = 'urbanscopejs';
 const DEPLOY_PASSWORD = 'AQYeaRV3dh';
 const DESTINATION = path.resolve( __dirname, 'deploy' );
 const SOURCE = [
   '**',
+  '!test/**',
+  '!test/',
+  '!deploy/**',
+  '!deploy/',
   '!gulpfile.js',
   '!todo.md',
 ];
@@ -40,7 +45,7 @@ gulp.task( 'copy', function() {
 } );
 
 gulp.task( 'rename', function() {
-  let sourceFileName = path.resolve( DESTINATION, 'crawler.js' );
+  let sourceFileName = path.resolve( DESTINATION, 'server.js' );
   let destinationFileName = 'app.js';
 
   return gulp.src( sourceFileName )
@@ -48,6 +53,15 @@ gulp.task( 'rename', function() {
   .pipe( gulp.dest( DESTINATION ) );
 } );
 
+gulp.task( 'configure:server', function() {
+  let sourceFileName = path.resolve( DESTINATION, 'config', 'index.json' );
+  return gulp.src( sourceFileName )
+  .pipe( jsonEditor( server => {
+    server.port = DEPLOY_PORT;
+    return server;
+  } ) )
+  .pipe( gulp.dest( DESTINATION+'/config/' ) );
+} );
 gulp.task( 'configure:redis', function() {
   let sourceFileName = path.resolve( DESTINATION, 'config', 'redis.json' );
   return gulp.src( sourceFileName )
@@ -74,7 +88,7 @@ gulp.task( 'configure:mongo', function() {
   } ) )
   .pipe( gulp.dest( DESTINATION+'/config/' ) );
 } );
-gulp.task( 'configure', [ 'configure:mongo', 'configure:redis' ] );
+gulp.task( 'configure', [ 'configure:mongo', 'configure:redis', 'configure:server' ] );
 
 
 // Default task
