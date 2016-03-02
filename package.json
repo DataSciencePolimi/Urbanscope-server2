@@ -28,10 +28,15 @@
     "stream-funnel": "1.x"
   },
   "devDependencies": {
-    "chai": "3.x",
+    "chai": "*",
+    "del": "*",
     "eslint-config-volox": "*",
-    "mocha": "2.x",
+    "gulp": "*",
+    "gulp-json-editor": "*",
+    "gulp-rename": "*",
+    "mocha": "*",
     "nodemon": "*",
+    "run-sequence": "*",
     "supertest": "1.x"
   }
 }
