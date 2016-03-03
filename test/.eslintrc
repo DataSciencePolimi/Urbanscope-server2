@@ -1,4 +1,11 @@
 {
+  "globals": {
+    "chai": false,
+    "expect": false,
+    "request": false,
+    "NUM_NILS": false,
+    "NUM_MUNICIPALITIES": false
+  },
   "env": {
     "mocha": true
   }

@@ -1,13 +1,12 @@
 'use strict';
 /* eslint-disable no-unused-expressions */
 
-process.env.NODE_ENV = 'test'; // Why not?
-
+let moment = require( 'moment' );
 let db = require( 'db-utils' );
 
 // Const
 const MONGO = require( '../config/mongo.json' );
-const INDEXES = require( '../config/indexes.json' );
+const INDEXES = require( '../config/mongo_indexes.json' );
 const MONGO_URL = MONGO.url;
 const MONGO_DB = 'UrbanScopeTest';
 const COLLECTIONS = MONGO.collections;
@@ -37,8 +36,18 @@ before( function initDatabase() {
 } );
 // Add sample data
 before( function addData() {
-  let data = SAMPLE_DATA.map( d => {
-    d.date = new Date( d.date );
+  let data = SAMPLE_DATA.map( ( d, i ) => {
+
+    d.date = moment.utc( d.date ).toDate();
+    d.timestamp = d.date.getTime();
+
+    d.id = d.id || 'ID:'+i;
+    d.text = d.text || 'Text '+i;
+    d.source = d.source || 'twitter';
+    d.author = d.author || 'author '+i;
+    d.authorId = d.authorId || 'AID:'+i;
+
+    d.raw = d.raw || {};
     return d;
   } );
 
