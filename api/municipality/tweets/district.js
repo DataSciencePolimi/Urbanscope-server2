@@ -5,10 +5,11 @@
 let co = require( 'co' );
 let _ = require( 'lodash' );
 let Boom = require( 'boom' );
+let db = require( 'db-utils' );
 let debug = require( 'debug' )( 'UrbanScope:server:api:municipality:tweets:district' );
 
 // Load my modules
-let db = require( 'db-utils' );
+let getTime = require( '../../../utils/time' );
 
 // Constant declaration
 const COLLECTION = 'posts';
@@ -19,6 +20,27 @@ const CACHE_MAX_AGE = 60*60*24*1; // 1 dd
 // Module variables declaration
 
 // Module functions declaration
+function getAction( municipality, filter, municipalityQueryTimes ) {
+  let query = _.assign( {}, filter, {
+    municipality: municipality,
+  } );
+
+  let action = db.find( COLLECTION, query, {
+    _id: 0,
+    lang: 1,
+  } );
+
+  debug( 'Requesting actions for municipality %d', municipality );
+  let startTime = getTime();
+  return action
+  .hint( 'LanguageMunicipality' )
+  .toArray()
+  .tap( ()=> {
+    let ms = getTime( startTime );
+    municipalityQueryTimes[ municipality ] = ms;
+    debug( 'municipality %d action COMPLETED in %d ms', municipality, ms )
+  } );
+}
 function* district( ctx ) {
   // Cache MAX_AGE
   ctx.maxAge = CACHE_MAX_AGE;
@@ -45,9 +67,9 @@ function* district( ctx ) {
   // Create query filter
   let filter = {
     source: 'twitter',
-    date: {
-      $gte: start.toDate(),
-      $lte: end.toDate(),
+    timestamp: {
+      $gte: start.toDate().getTime(),
+      $lte: end.toDate().getTime(),
     },
   };
 
@@ -70,30 +92,29 @@ function* district( ctx ) {
   }
 
 
-  // Prepare all the actions(queries) to execute so we can optimize the performance
+  // Start the query "actions"
   let actions = {};
+  let municipalityQueryTimes = {};
   for( let municipality of selectedMunicipalities ) {
-    let query = _.assign( {}, filter, {
-      municipality: municipality,
-    } );
-
-    let action = db.find( COLLECTION, query, {
-      _id: 0,
-      lang: 1,
-    } );
-
-    actions[ municipality ] = action
-    .hint( { municipality: 1 } )
-    .toArray();
+    actions[ municipality ] = getAction( municipality, filter, municipalityQueryTimes );
   }
+  ctx.metadata.nilQueryTimes = municipalityQueryTimes;
 
   // Get all posts
+  debug( 'Requesting actions' );
+  let startTime = getTime();
   let municipalityData = yield actions;
+  let ms = getTime( startTime );
+  ctx.metadata.query = ms;
+  debug( 'Requesting actions COMPLETED in %d ms', ms );
 
+  // Make some data manipulation
+  debug( 'Data elaboration' );
+  startTime = getTime();
   municipalityData = _( municipalityData )
   .map( ( data, municipality ) => {
     let languages = _.countBy( data, 'lang' );
-    let value = _.sum( languages );
+    let value = _( languages ).map().sum();
 
     return {
       value: value,
@@ -102,11 +123,15 @@ function* district( ctx ) {
     };
   } )
   .value();
-
-
   response.selectedMunicipalities = selectedMunicipalities;
   response.municipalities = municipalityData;
 
+
+  ms = getTime( startTime );
+  ctx.metadata.elaboration = ms;
+  debug( 'Data elaboration COMPLETED in %d ms', ms );
+
+  // Set response
   ctx.body = response;
 }
 // Module class declaration

@@ -115,7 +115,7 @@ function* district( ctx ) {
   nilData = _( nilData )
   .map( ( data, nil ) => {
     let languages = _.countBy( data, 'lang' );
-    let value = _.sum( languages );
+    let value = _( languages ).map().sum();
 
     return {
       value: value,
