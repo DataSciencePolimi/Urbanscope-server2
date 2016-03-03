@@ -32,8 +32,14 @@ function set( key, value, maxAge ) {
     value = JSON.stringify( value );
   }
 
-  return redis
-  .set( key, value, 'EX', maxAge );
+  if( maxAge<Infinity ) {
+    return redis
+    .set( key, value, 'EX', maxAge );
+  } else {
+    return redis
+    .set( key, value );
+  }
+
 }
 function initCache( options ) {
   options = options || {};
