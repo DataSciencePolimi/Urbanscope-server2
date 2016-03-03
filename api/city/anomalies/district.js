@@ -5,6 +5,7 @@
 let co = require( 'co' );
 let _ = require( 'lodash' );
 let Boom = require( 'boom' );
+let moment = require( 'moment' );
 let debug = require( 'debug' )( 'UrbanScope:server:api:city:anomalies:district' );
 
 // Load my modules
@@ -14,14 +15,14 @@ let getTime = require( '../../../utils/time' );
 // Constant declaration
 const DATE_FORMAT = require( '../../../config/' ).dateFormat;
 const NILS = require( '../../../config/milan_nils.json' );
-const CACHE_MAX_AGE = 60*60*24*90; // 90 dd
+const CACHE_MAX_AGE = 60*60*24; // 1 dd
 
 // Module variables declaration
 
 // Module functions declaration
 function* district( ctx ) {
   // Cache MAX_AGE
-  ctx.maxAge = CACHE_MAX_AGE;
+  ctx.maxAge = Infinity; // We can store past values forever
 
   debug( 'Requested district' );
 
@@ -39,6 +40,12 @@ function* district( ctx ) {
     endDate: end.format( DATE_FORMAT ),
     lang: language,
   };
+
+
+  if( moment().isBetween( start, end ) ) {
+    // We cannot store the values forever, since we are in the timespan
+    ctx.maxAge = CACHE_MAX_AGE;
+  }
 
 
   // Create query filter
