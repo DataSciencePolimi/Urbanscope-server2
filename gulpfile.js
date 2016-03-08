@@ -4,9 +4,10 @@ const url = require( 'url' );
 const path = require( 'path' );
 
 // Load modules
-const gulp = require( 'gulp' );
-const rename = require( 'gulp-rename' );
 const del = require( 'del' );
+const gulp = require( 'gulp' );
+const run = require( 'gulp-run' );
+const rename = require( 'gulp-rename' );
 const jsonEditor = require( 'gulp-json-editor' );
 const runSequence = require( 'run-sequence' );
 
@@ -33,9 +34,10 @@ const SOURCE = [
 // Task definitions
 gulp.task( 'clean', function() {
   return del( [
-    'deploy/**/*',
+    'deploy/',
   ] );
 } );
+
 
 gulp.task( 'copy', function() {
   return gulp.src( SOURCE, {
@@ -43,6 +45,7 @@ gulp.task( 'copy', function() {
   } )
   .pipe( gulp.dest( DESTINATION ) );
 } );
+
 
 gulp.task( 'rename', function() {
   let sourceFileName = path.resolve( DESTINATION, 'server.js' );
@@ -52,6 +55,7 @@ gulp.task( 'rename', function() {
   .pipe( rename( destinationFileName ) )
   .pipe( gulp.dest( DESTINATION ) );
 } );
+
 
 gulp.task( 'configure:server', function() {
   let sourceFileName = path.resolve( DESTINATION, 'config', 'index.json' );
@@ -91,9 +95,14 @@ gulp.task( 'configure:mongo', function() {
 gulp.task( 'configure', [ 'configure:mongo', 'configure:redis', 'configure:server' ] );
 
 
+gulp.task( 'install-dep', function() {
+  return run( 'npm install --production' ).exec();
+} );
+
+
 // Default task
 gulp.task( 'default', function( callback ) {
-  runSequence( 'clean', 'copy', [ 'rename', 'configure' ], callback );
+  runSequence( 'clean', 'copy', [ 'rename', 'configure', 'install-dep' ], callback );
 } );
 
 //  50 6F 77 65 72 65 64  62 79  56 6F 6C 6F 78
