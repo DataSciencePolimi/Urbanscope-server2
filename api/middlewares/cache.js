@@ -9,12 +9,11 @@ let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:cache' );
 // Load my modules
 
 // Constant declaration
+const REDIS_CONFIG = require( '../../config/redis.json' );
 const MAX_AGE = 60*30; // 5 min
 
 // Module variables declaration
-let redis = new Redis( {
-  keyPrefix: 'UrbanScope:server:',
-} );
+let redis = new Redis( REDIS_CONFIG );
 
 // Module functions declaration
 function hashFn( ctx ) {
