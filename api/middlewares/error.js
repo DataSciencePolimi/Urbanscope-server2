@@ -2,9 +2,9 @@
 // Load system modules
 
 // Load modules
-let co = require( 'co' );
-let Boom = require( 'boom' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:error' );
+const co = require( 'co' );
+const Boom = require( 'boom' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:error' );
 
 // Load my modules
 
@@ -17,7 +17,7 @@ function* handleError( ctx, next ) {
   try {
     yield next();
   } catch( err ) {
-    let myErr = Boom.wrap( err );
+    const myErr = Boom.wrap( err );
 
     debug( 'API error', myErr );
 

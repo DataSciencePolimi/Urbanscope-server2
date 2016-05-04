@@ -2,14 +2,14 @@
 // Load system modules
 
 // Load modules
-let co = require( 'co' );
-let _ = require( 'lodash' );
-let Boom = require( 'boom' );
-let moment = require( 'moment' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:city:calls:list' );
+const co = require( 'co' );
+const _ = require( 'lodash' );
+const Boom = require( 'boom' );
+const moment = require( 'moment' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:city:calls:list' );
 
 // Load my modules
-let db = require( 'db-utils' );
+const db = require( 'db-utils' );
 
 // Constant declaration
 const COLLECTION = 'calls';
@@ -21,23 +21,23 @@ const DATE_FORMAT = require( '../../../config/' ).dateFormat;
 function* timeline( ctx ) {
   debug( 'Requested timeline' );
 
-  let start = ctx.startDate;
-  let end = ctx.endDate;
-  let limit = ctx.limit;
+  const start = ctx.startDate;
+  const end = ctx.endDate;
+  const limit = ctx.limit;
 
 
   if( start.isAfter( end ) ) {
     throw Boom.badRequest( 'Start date after end date' );
   }
 
-  let response = {
+  const response = {
     startDate: start.format( DATE_FORMAT ),
     endDate: end.format( DATE_FORMAT ),
   };
 
 
   // Create query filter
-  let filter = {
+  const filter = {
     date: {
       $gte: start.toDate(),
       $lte: end.toDate(),
@@ -45,7 +45,7 @@ function* timeline( ctx ) {
   };
 
   // Get the calls
-  let calls = yield db
+  const calls = yield db
   .find( COLLECTION, filter )
   .limit( limit )
   .toArray();
@@ -53,7 +53,7 @@ function* timeline( ctx ) {
   // Parse the calls to get the results
   response.list = _( calls )
   .map( data => {
-    let date = moment.utc( data.date );
+    const date = moment.utc( data.date );
 
     return {
       date: date.format( DATE_FORMAT ),

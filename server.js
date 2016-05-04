@@ -2,15 +2,17 @@
 // Load system modules
 
 // Load modules
-let Promise = require( 'bluebird' );
-let debug = require( 'debug' )( 'UrbanScope:server' );
+// const Promise = require( 'bluebird' );
+const Redis = require( 'ioredis' );
+const debug = require( 'debug' )( 'UrbanScope:server' );
 
 // Load my modules
-let db = require( 'db-utils' );
-let api = require( './api/' );
+const db = require( 'db-utils' );
+const api = require( './api/' );
 
 // Constant declaration
 const CONFIG = require( './config/index.json' );
+const REDIS_CONFIG = require( './config/redis.json' );
 const MONGO = require( './config/mongo.json' );
 const COLLECTIONS = MONGO.collections;
 const DB_URL = MONGO.url;
@@ -30,7 +32,11 @@ db.open( DB_URL, DB_NAME )
 .then( ()=> {
   debug( 'DB ready, starting webserver' );
 
+  api.context.redis = new Redis( REDIS_CONFIG );
+  api.context.db = db;
+
   api.listen( CONFIG.port );
+
   debug( 'Server ready on port %d', CONFIG.port );
 } )
 

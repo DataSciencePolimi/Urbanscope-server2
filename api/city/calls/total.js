@@ -2,13 +2,13 @@
 // Load system modules
 
 // Load modules
-let co = require( 'co' );
-let _ = require( 'lodash' );
-let Boom = require( 'boom' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:city:calls:total' );
+const co = require( 'co' );
+const _ = require( 'lodash' );
+const Boom = require( 'boom' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:city:calls:total' );
 
 // Load my modules
-let db = require( 'db-utils' );
+const db = require( 'db-utils' );
 
 // Constant declaration
 const COLLECTION = 'calls';
@@ -18,11 +18,11 @@ const DATE_FORMAT = require( '../../../config/' ).dateFormat;
 
 // Module functions declaration
 function getCountries( countries ) {
-  let countriesMap = _( countries )
+  const countriesMap = _( countries )
   .groupBy( 'country' )
   .mapValues( data => {
-    let callIn = _.sum( data, 'callIn' );
-    let callOut = _.sum( data, 'callOut' );
+    const callIn = _.sum( data, 'callIn' );
+    const callOut = _.sum( data, 'callOut' );
 
     return {
       in: callIn,
@@ -37,21 +37,21 @@ function getCountries( countries ) {
 function* total( ctx ) {
   debug( 'Requested total' );
 
-  let start = ctx.startDate;
-  let end = ctx.endDate;
+  const start = ctx.startDate;
+  const end = ctx.endDate;
 
   if( start.isAfter( end ) ) {
     throw Boom.badRequest( 'Start date after end date' );
   }
 
-  let response = {
+  const response = {
     startDate: start.format( DATE_FORMAT ),
     endDate: end.format( DATE_FORMAT ),
   };
 
 
   // Create query filter
-  let filter = {
+  const filter = {
     date: {
       $gte: start.toDate(),
       $lte: end.toDate(),
@@ -59,7 +59,7 @@ function* total( ctx ) {
   };
 
   // Get the calls
-  let pipeline = [];
+  const pipeline = [];
   // Add filter
   pipeline.push( {
     $match: filter,
@@ -86,18 +86,18 @@ function* total( ctx ) {
   } );
 
   // Start the pipeline
-  let calls = yield db
+  const calls = yield db
   .aggregate( COLLECTION, pipeline )
   .toArray();
 
   // Parse the calls to get the results
   response.calls = _( calls )
   .map( data => {
-    let year = data.date.y;
+    const year = data.date.y;
     let month = data.date.m;
 
     // Zeropad
-    month = month<9? '0'+month : month;
+    month = month < 9? '0'+month : month;
 
     return {
       date: year + '-' + month,

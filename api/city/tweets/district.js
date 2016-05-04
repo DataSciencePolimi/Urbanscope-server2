@@ -2,14 +2,14 @@
 // Load system modules
 
 // Load modules
-let co = require( 'co' );
-let _ = require( 'lodash' );
-let Boom = require( 'boom' );
-let db = require( 'db-utils' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:city:tweets:district' );
+const co = require( 'co' );
+const _ = require( 'lodash' );
+const Boom = require( 'boom' );
+const db = require( 'db-utils' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:city:tweets:district' );
 
 // Load my modules
-let getTime = require( '../../../utils/time' );
+const getTime = require( '../../../utils/time' );
 
 // Constant declaration
 const COLLECTION = 'posts';
@@ -21,22 +21,22 @@ const CACHE_MAX_AGE = 60*60*24*1; // 1 dd
 
 // Module functions declaration
 function getAction( nil, filter, nilQueryTimes ) {
-  let query = _.assign( {}, filter, {
+  const query = _.assign( {}, filter, {
     nil: nil,
   } );
 
-  let action = db.find( COLLECTION, query, {
+  const action = db.find( COLLECTION, query, {
     _id: 0,
     lang: 1,
   } );
 
   debug( 'Requesting actions for nil %d', nil );
-  let startTime = getTime();
+  const startTime = getTime();
   return action
   .hint( 'LanguageNil' )
   .toArray()
   .tap( ()=> {
-    let ms = getTime( startTime );
+    const ms = getTime( startTime );
     nilQueryTimes[ nil ] = ms;
     debug( 'Nil %d action COMPLETED in %d ms', nil, ms )
   } );
@@ -48,17 +48,17 @@ function* district( ctx ) {
 
   debug( 'Requested district' );
 
-  let start = ctx.startDate;
-  let end = ctx.endDate;
-  let language = ctx.language;
-  let nils = ctx.nils;
+  const start = ctx.startDate;
+  const end = ctx.endDate;
+  const language = ctx.language;
+  const nils = ctx.nils;
 
 
   if( start.isAfter( end ) ) {
     throw Boom.badRequest( 'Start date after end date' );
   }
 
-  let response = {
+  const response = {
     startDate: start.format( DATE_FORMAT ),
     endDate: end.format( DATE_FORMAT ),
     language: language,
@@ -66,7 +66,7 @@ function* district( ctx ) {
 
 
   // Create query filter
-  let filter = {
+  const filter = {
     source: 'twitter',
     timestamp: {
       $gte: start.toDate().getTime(),
@@ -80,7 +80,7 @@ function* district( ctx ) {
   if( nils.length ) {
     selectedNils = nils;
   } else {
-    let allNils = _.map( NILS, 'properties.ID_NIL' );
+    const allNils = _.map( NILS, 'properties.ID_NIL' );
     selectedNils = allNils;
   }
 
@@ -93,9 +93,9 @@ function* district( ctx ) {
   }
 
   // Start the query "actions"
-  let actions = {};
-  let nilQueryTimes = {};
-  for( let nil of selectedNils ) {
+  const actions = {};
+  const nilQueryTimes = {};
+  for( const nil of selectedNils ) {
     actions[ nil ] = getAction( nil, filter, nilQueryTimes );
   }
   ctx.metadata.nilQueryTimes = nilQueryTimes;
@@ -114,8 +114,8 @@ function* district( ctx ) {
   startTime = getTime();
   nilData = _( nilData )
   .map( ( data, nil ) => {
-    let languages = _.countBy( data, 'lang' );
-    let value = _( languages ).map().sum();
+    const languages = _.countBy( data, 'lang' );
+    const value = _( languages ).map().sum();
 
     return {
       value: value,

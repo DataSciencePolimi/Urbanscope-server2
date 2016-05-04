@@ -2,9 +2,9 @@
 // Load system modules
 
 // Load modules
-let Boom = require( 'boom' );
-let _ = require( 'lodash' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:call-type' );
+const Boom = require( 'boom' );
+const _ = require( 'lodash' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:call-type' );
 
 // Load my modules
 
@@ -20,12 +20,12 @@ const VALID_VALUES = [
 function getCallType( ctx, next ) {
   debug( 'Get call type' );
 
-  let qs = ctx.request.query;
+  const qs = ctx.request.query;
   let type = qs.type || VALID_VALUES[ 0 ];
   type = type.toLowerCase();
 
   if( !_.includes( VALID_VALUES, type ) ) {
-    let message = '"type" parameter must be one of: '+VALID_VALUES.join( ',' );
+    const message = '"type" parameter must be one of: '+VALID_VALUES.join( ',' );
     throw Boom.badRequest( message );
   }
   ctx.callType = type;

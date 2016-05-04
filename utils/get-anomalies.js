@@ -2,13 +2,14 @@
 // Load system modules
 
 // Load modules
-let _ = require( 'lodash' );
-let db = require( 'db-utils' );
-let Promise = require( 'bluebird' );
-let debug = require( 'debug' )( 'UrbanScope:utils:anomalies' );
+const _ = require( 'lodash' );
+const db = require( 'db-utils' );
+const Promise = require( 'bluebird' );
+const debug = require( 'debug' )( 'UrbanScope:utils:anomalies' );
 
 // Load my modules
-let getTime = require( './time' );
+const getQuantiles = require( './get-quantiles' );
+const getTime = require( './time' );
 
 // Constant declaration
 const COLLECTION = 'posts';
@@ -23,39 +24,12 @@ const THRESHOLD = 100;
 // Module variables declaration
 
 // Module functions declaration
-function calculateQuartile( i, base, values ) {
-  let Fi = i/base;
-  let n = values.length;
-  let int = Math.floor;
-
-  let prod = n*Fi;
-  let val;
-
-  // Check if the product is an integer
-  if( int( prod )===prod ) {
-    val = (values[ prod-1 ] + values[ prod ])/2;
-  } else {
-    val = values[ int( prod ) ];
-  }
-
-  return val;
-}
-function getQuantiles( num, base, values ) {
-  let sortedValues = values.sort();
-
-  let quantiles = [];
-  for( var i=1; i<=num; i++ ) {
-    quantiles.push( calculateQuartile( i, base, sortedValues ) );
-  }
-
-  return quantiles;
-}
 function assignClass( data ) {
-  let values = _.map( data, 'value' );
-  let q = getQuantiles( 3, 4, values );
+  const values = _.map( data, 'value' );
+  const q = getQuantiles( 3, 4, values );
 
-  let t3 = q[2];
-  let t4 = q[2] + 1.5*(q[2]-q[0]);
+  const t3 = q[2];
+  const t4 = q[2] + 1.5*(q[2]-q[0]);
 
   return _.map( data, element => {
 
@@ -82,7 +56,7 @@ function getLanguage( language ) {
 }
 
 function convertToObject( property, data, id ) {
-  let languages = _.map( data, 'lang' );
+  const languages = _.map( data, 'lang' );
 
   return {
     [property]: Number( id ),
@@ -91,15 +65,15 @@ function convertToObject( property, data, id ) {
   }
 }
 function getData( type, id, filter, times ) {
-  let indexHint = indexMap[ type ];
+  const indexHint = indexMap[ type ];
 
-  let query = _.assign( {}, filter, {
+  const query = _.assign( {}, filter, {
     [type]: id,
   } );
 
 
   debug( 'Requesting data for %s[%s]', type, id );
-  let startTime = getTime();
+  const startTime = getTime();
   return db.find( COLLECTION, query, {
     _id: 0,
     lang: 1,
@@ -107,9 +81,9 @@ function getData( type, id, filter, times ) {
   .hint( indexHint )
   .toArray()
   .tap( () => {
-    let ms = getTime( startTime );
+    const ms = getTime( startTime );
     times[ id ] = ms;
-    debug( 'Requesting data for %s[%s] COMPLETED in %d ms', type, id, ms );
+    debug( 'Requesting data for %s[%s] COMPconstED in %d ms', type, id, ms );
   } );
 }
 function getAnomalies( filter, language, type, profile ) {
@@ -124,24 +98,24 @@ function getAnomalies( filter, language, type, profile ) {
     throw new Error( `Type "${type}" not recognized as valid` );
   }
 
-  let actions = {};
-  let times = {};
-  for( let id of all ) {
+  const actions = {};
+  const times = {};
+  for( const id of all ) {
     actions[ id ] = getData( type, id, filter, times );
   }
   profile[ type ] = times;
 
 
   debug( 'Requesting actions' );
-  let queryTime = getTime();
+  const queryTime = getTime();
   let elaborationTime;
   // Get all posts
   return Promise
   .props( actions )
   .tap( () => {
-    let ms = getTime( queryTime );
+    const ms = getTime( queryTime );
     profile.query = ms;
-    debug( 'Requesting actions COMPLETED in %d ms', ms );
+    debug( 'Requesting actions COMPconstED in %d ms', ms );
 
     debug( 'Data elaboration' );
     elaborationTime = getTime();
@@ -152,9 +126,11 @@ function getAnomalies( filter, language, type, profile ) {
     .value()
   )
   .map( o => {
-    let total = o.count;
+    const total = o.count;
 
-    let languages = _( o.langs )
+    debug( 'Nil[%d]: %d', o.nil, total );
+
+    const languages = _( o.langs )
     .map( getLanguage )
     .countBy()
     .mapValues( val => val/total )
@@ -167,9 +143,9 @@ function getAnomalies( filter, language, type, profile ) {
   } )
   .then( assignClass )
   .tap( () => {
-    let ms = getTime( elaborationTime );
+    const ms = getTime( elaborationTime );
     profile.elaboration = ms;
-    debug( 'Data elaboration COMPLETED in %d ms', ms );
+    debug( 'Data elaboration COMPconstED in %d ms', ms );
   } )
   ;
 }

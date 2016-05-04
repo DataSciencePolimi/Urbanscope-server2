@@ -2,31 +2,29 @@
 // Load system modules
 
 // Load modules
-let co = require( 'co' );
-let Redis = require( 'ioredis' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:cache' );
+const co = require( 'co' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:cache' );
 
 // Load my modules
 
 // Constant declaration
-const REDIS_CONFIG = require( '../../config/redis.json' );
 const MAX_AGE = 60*30; // 5 min
+const PREFIX = 'cache:'; // 5 min
 
 // Module variables declaration
-let redis = new Redis( REDIS_CONFIG );
 
 // Module functions declaration
 function hashFn( ctx ) {
-  return ctx.request.url;
+  return PREFIX+ctx.request.url;
 }
-function get( key ) {
+function get( redis, key ) {
   return redis
   .get( key )
   .then( value => {
     if( value ) return JSON.parse( value );
   } )
 }
-function set( key, value, maxAge ) {
+function set( redis, key, value, maxAge ) {
   if( typeof value!=='string' ) {
     value = JSON.stringify( value );
   }
@@ -42,14 +40,15 @@ function set( key, value, maxAge ) {
 }
 function initCache( options ) {
   options = options || {};
-  let maxAge = options.maxAge || MAX_AGE;
-  let hash = options.hash || hashFn;
+  const maxAge = options.maxAge || MAX_AGE;
+  const hash = options.hash || hashFn;
 
   return co.wrap( function* cacheMiddleware( ctx, next ) {
     debug( 'Check cache hit' );
+    const redis = ctx.app.context.redis;
 
-    let key = hash( ctx );
-    let val = yield get( key );
+    const key = hash( ctx );
+    const val = yield get( redis, key );
 
     if( val ) {
       debug( 'Cache hit' );
@@ -63,7 +62,7 @@ function initCache( options ) {
       if( !ctx.body ) return;
 
       debug( 'Add cache entry' );
-      yield set( key, ctx.body, ctx.maxAge || maxAge );
+      yield set( redis, key, ctx.body, ctx.maxAge || maxAge );
     }
   } );
 }

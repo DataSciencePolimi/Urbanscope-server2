@@ -2,11 +2,11 @@
 // Load system modules
 
 // Load modules
-let co = require( 'co' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:metadata' );
+const co = require( 'co' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:metadata' );
 
 // Load my modules
-let getTime = require( '../../utils/time' );
+const getTime = require( '../../utils/time' );
 
 // Constant declaration
 
@@ -19,14 +19,14 @@ function* setMetadata( ctx, next ) {
   ctx.metadata = {};
 
   // Init time
-  let start = getTime();
+  const start = getTime();
 
   // Wait for all to complete
   yield next();
   debug( 'After all' );
 
   // Get request time
-  let ms = getTime( start );
+  const ms = getTime( start );
   debug( '%s took %d ms', ctx.path, ms );
 
   ctx.metadata.completedIn = ms;

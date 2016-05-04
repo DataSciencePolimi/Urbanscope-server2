@@ -2,9 +2,9 @@
 // Load system modules
 
 // Load modules
-let _ = require( 'lodash' );
-let Boom = require( 'boom' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:order' );
+const _ = require( 'lodash' );
+const Boom = require( 'boom' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:order' );
 
 // Load my modules
 
@@ -21,12 +21,12 @@ const VALID_VALUES = [
 function getOrder( ctx, next ) {
   debug( 'Get orderBy' );
 
-  let qs = ctx.request.query;
+  const qs = ctx.request.query;
   let orderBy = qs.orderBy || VALID_VALUES[ 0 ];
   orderBy = orderBy.toLowerCase();
 
   if( !_.includes( VALID_VALUES, orderBy ) ) {
-    let message = '"orderBy" parameter must be one of: '+VALID_VALUES.join( ',' );
+    const message = '"orderBy" parameter must be one of: '+VALID_VALUES.join( ',' );
     throw Boom.badRequest( message );
   }
 

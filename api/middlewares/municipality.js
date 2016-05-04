@@ -2,9 +2,9 @@
 // Load system modules
 
 // Load modules
-let _ = require( 'lodash' );
-let Boom = require( 'boom' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:municipality' );
+const _ = require( 'lodash' );
+const Boom = require( 'boom' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:municipality' );
 
 // Load my modules
 
@@ -18,8 +18,8 @@ const DEFAULT_MUNICIPALITY = _( MUNICIPALITIES ).map( 'properties.PRO_COM' ).fir
 function getParam( ctx ) {
   debug( 'Get municipality param' );
 
-  let qs = ctx.request.query;
-  let municipality = qs.municipality_ID;
+  const qs = ctx.request.query;
+  const municipality = qs.municipality_ID;
 
   return municipality;
 }
@@ -35,8 +35,8 @@ function getMunicipalities( ctx, next ) {
     .map( municipality => parseInt( municipality, 10 ) );
 
     // Check each municipality
-    for( let municipality of municipalities ) {
-      if( isNaN( municipality ) || municipality<=0 ) {
+    for( const municipality of municipalities ) {
+      if( isNaN( municipality ) || municipality <= 0 ) {
         throw Boom.badRequest( `Municipality "${municipality}" not a positive number` );
       }
     }
@@ -51,7 +51,7 @@ function getMunicipalities( ctx, next ) {
 function getMunicipality( ctx, next ) {
   debug( 'Get municipality' );
 
-  let municipality = getParam( ctx ) || DEFAULT_MUNICIPALITY;
+  const municipality = getParam( ctx ) || DEFAULT_MUNICIPALITY;
 
   ctx.municipality = parseInt( municipality, 10 );
 

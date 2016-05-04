@@ -2,9 +2,9 @@
 // Load system modules
 
 // Load modules
-let Boom = require( 'boom' );
-let _ = require( 'lodash' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:language' );
+const Boom = require( 'boom' );
+const _ = require( 'lodash' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:language' );
 
 // Load my modules
 
@@ -21,12 +21,12 @@ const VALID_VALUES = [
 function getLanguage( ctx, next ) {
   debug( 'Get language' );
 
-  let qs = ctx.request.query;
+  const qs = ctx.request.query;
   let lang = qs.lang || VALID_VALUES[ 0 ];
   lang = lang.toLowerCase();
 
   if( !_.includes( VALID_VALUES, lang ) ) {
-    let message = '"lang" parameter must be one of: '+VALID_VALUES.join( ',' );
+    const message = '"lang" parameter must be one of: '+VALID_VALUES.join( ',' );
     throw Boom.badRequest( message );
   }
   ctx.language = lang;

@@ -1,3 +1,4 @@
 {
-  "keyPrefix": "UrbanScope:server:"
+  "host": "localhost",
+  "keyPrefix": "UrbanScope:"
 }

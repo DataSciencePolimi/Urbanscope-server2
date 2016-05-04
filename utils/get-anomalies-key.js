@@ -11,14 +11,8 @@
 // Module variables declaration
 
 // Module functions declaration
-function getNsTime( time ) {
-  if( time ) {
-    const diff = process.hrtime( time );
-    const ns = diff[ 0 ]*1e9+diff[ 1 ];
-    return ns/1000000;
-  } else {
-    return process.hrtime();
-  }
+function getKey( year, trimester, type, id ) {
+  return `${year}_${trimester}_${type}_${id}`;
 }
 
 
@@ -27,6 +21,6 @@ function getNsTime( time ) {
 // Module initialization (at first load)
 
 // Module exports
-module.exports = getNsTime;
+module.exports = getKey;
 
 //  50 6F 77 65 72 65 64  62 79  56 6F 6C 6F 78

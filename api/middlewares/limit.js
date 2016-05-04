@@ -2,8 +2,8 @@
 // Load system modules
 
 // Load modules
-let Boom = require( 'boom' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:limit' );
+const Boom = require( 'boom' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:limit' );
 
 // Load my modules
 
@@ -15,7 +15,7 @@ let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:limit' );
 function getLimit( ctx, next ) {
   debug( 'Get limit' );
 
-  let qs = ctx.request.query;
+  const qs = ctx.request.query;
   let limit = qs.limit || '100';
   try {
     limit = parseInt( limit, 10 );
@@ -25,7 +25,7 @@ function getLimit( ctx, next ) {
 
   if( isNaN( limit ) ) {
     throw Boom.badRequest( '"limit" value is invalid' )
-  } else if( limit<=0 ) {
+  } else if( limit <= 0 ) {
     throw Boom.badRequest( '"limit" must be greater than 0' )
   }
 

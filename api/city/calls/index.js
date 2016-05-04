@@ -2,26 +2,26 @@
 // Load system modules
 
 // Load modules
-let Router = require( 'koa-router' );
-let compose = require( 'koa-compose' );
+const Router = require( 'koa-router' );
+const compose = require( 'koa-compose' );
 
 // Load my modules
-let startDate = require( '../../middlewares/start-date' );
-let endDate = require( '../../middlewares/end-date' );
-let callType = require( '../../middlewares/call-type' );
-let parseNil = require( '../../middlewares/nil' );
-let limit = require( '../../middlewares/limit' );
-let order = require( '../../middlewares/order' );
-let district = require( './district' );
-let timeline = require( './timeline' );
-let list = require( './list' );
-let total = require( './total' );
-let top = require( './top' );
+const startDate = require( '../../middlewares/start-date' );
+const endDate = require( '../../middlewares/end-date' );
+const callType = require( '../../middlewares/call-type' );
+const parseNil = require( '../../middlewares/nil' );
+const limit = require( '../../middlewares/limit' );
+const order = require( '../../middlewares/order' );
+const district = require( './district' );
+const timeline = require( './timeline' );
+const list = require( './list' );
+const total = require( './total' );
+const top = require( './top' );
 
 // Constant declaration
 
 // Module variables declaration
-let dates = compose( [
+const dates = compose( [
   startDate,
   endDate,
 ] );
@@ -31,7 +31,7 @@ let dates = compose( [
 // Module class declaration
 
 // Module initialization (at first load)
-let router = new Router();
+const router = new Router();
 router.get( '/district', compose( [
   dates,
   callType,

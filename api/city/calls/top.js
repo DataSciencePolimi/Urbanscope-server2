@@ -2,13 +2,13 @@
 // Load system modules
 
 // Load modules
-let co = require( 'co' );
-let _ = require( 'lodash' );
-let Boom = require( 'boom' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:city:calls:top' );
+const co = require( 'co' );
+// const _ = require( 'lodash' );
+const Boom = require( 'boom' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:city:calls:top' );
 
 // Load my modules
-let db = require( 'db-utils' );
+const db = require( 'db-utils' );
 
 // Constant declaration
 const COLLECTION = 'calls';
@@ -20,16 +20,16 @@ const DATE_FORMAT = require( '../../../config/' ).dateFormat;
 function* top( ctx ) {
   debug( 'Requested top' );
 
-  let start = ctx.startDate;
-  let end = ctx.endDate;
-  let limit = ctx.limit;
-  let orderBy = ctx.orderBy;
+  const start = ctx.startDate;
+  const end = ctx.endDate;
+  const limit = ctx.limit;
+  const orderBy = ctx.orderBy;
 
   if( start.isAfter( end ) ) {
     throw Boom.badRequest( 'Start date after end date' );
   }
 
-  let response = {
+  const response = {
     startDate: start.format( DATE_FORMAT ),
     endDate: end.format( DATE_FORMAT ),
     limit: limit,
@@ -38,7 +38,7 @@ function* top( ctx ) {
 
 
   // Create query filter
-  let filter = {
+  const filter = {
     date: {
       $gte: start.toDate(),
       $lte: end.toDate(),
@@ -46,7 +46,7 @@ function* top( ctx ) {
   };
 
   // Get the calls
-  let pipeline = [];
+  const pipeline = [];
   // Add filter
   pipeline.push( {
     $match: filter,
@@ -82,7 +82,7 @@ function* top( ctx ) {
   } );
 
   // Start the pipeline
-  let calls = yield db
+  const calls = yield db
   .aggregate( COLLECTION, pipeline )
   .toArray();
 

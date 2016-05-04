@@ -2,11 +2,11 @@
 // Load system modules
 
 // Load modules
-let co = require( 'co' );
-let _ = require( 'lodash' );
-let Boom = require( 'boom' );
-let db = require( 'db-utils' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:city:calls:district' );
+const co = require( 'co' );
+const _ = require( 'lodash' );
+const Boom = require( 'boom' );
+const db = require( 'db-utils' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:city:calls:district' );
 
 // Load my modules
 
@@ -21,13 +21,13 @@ function convertToNilObject( field, calls, nil ) {
   nil = Number( nil ); // force conversion to Number
 
   // Get countries sum
-  let countries = _( calls )
+  const countries = _( calls )
   .groupBy( 'country' )
   .mapValues( data => _.sum( data, field ) )
   .value();
 
   // Get total
-  let total = _.sum( calls, field );
+  const total = _.sum( calls, field );
 
   return {
     nil,
@@ -38,17 +38,17 @@ function convertToNilObject( field, calls, nil ) {
 function* district( ctx ) {
   debug( 'Requested district' );
 
-  let start = ctx.startDate;
-  let end = ctx.endDate;
-  let type = ctx.callType;
-  let nils = ctx.nils;
+  const start = ctx.startDate;
+  const end = ctx.endDate;
+  const type = ctx.callType;
+  const nils = ctx.nils;
 
 
   if( start.isAfter( end ) ) {
     throw Boom.badRequest( 'Start date after end date' );
   }
 
-  let response = {
+  const response = {
     startDate: start.format( DATE_FORMAT ),
     endDate: end.format( DATE_FORMAT ),
     type: type,
@@ -56,7 +56,7 @@ function* district( ctx ) {
 
 
   // Create query filter
-  let filter = {
+  const filter = {
     date: {
       $gte: start.toDate(),
       $lte: end.toDate(),
@@ -72,12 +72,12 @@ function* district( ctx ) {
   }
 
   // Get the field on which to do summations
-  let callField = _.camelCase( 'call '+ type );
+  const callField = _.camelCase( 'call '+ type );
 
   // Get all calls
-  let calls = yield db.find( COLLECTION, filter ).toArray();
+  const calls = yield db.find( COLLECTION, filter ).toArray();
 
-  let convertToNil = _.partial( convertToNilObject, callField );
+  const convertToNil = _.partial( convertToNilObject, callField );
   // Parse the calls to get the results
   response.nils = _( calls )
   .groupBy( 'nil' )

@@ -2,9 +2,9 @@
 // Load system modules
 
 // Load modules
-let Boom = require( 'boom' );
-let moment = require( 'moment' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:start-date' );
+const Boom = require( 'boom' );
+const moment = require( 'moment' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:start-date' );
 
 // Load my modules
 
@@ -17,7 +17,7 @@ const DATE_FORMAT = require( '../../config/' ).dateFormat;
 function getStartDate( ctx, next ) {
   debug( 'Get start date' );
 
-  let qs = ctx.request.query;
+  const qs = ctx.request.query;
   let start = qs.startDate;
 
   // Use passed date or now
@@ -28,7 +28,7 @@ function getStartDate( ctx, next ) {
   }
 
   if( !start.isValid() ) {
-    let message = 'Invalid "startDate" format, please stick to '+DATE_FORMAT;
+    const message = 'Invalid "startDate" format, please stick to '+DATE_FORMAT;
     throw Boom.badRequest( message );
   }
 

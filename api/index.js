@@ -4,15 +4,15 @@
 // Load modules
 const Koa = require( 'koa' );
 const Router = require( 'koa-router' );
-const helmet = require( 'koa-helmet' );
+// const helmet = require( 'koa-helmet' );
 const debug = require( 'debug' )( 'UrbanScope:server:api' );
 
 // Load my modules
-let setMetadata = require( './middlewares/metadata' );
-let handleErrors = require( './middlewares/error' );
-let cache = require( './middlewares/cache' );
-let cityRouter = require( './city/' );
-let municipalityRouter = require( './municipality/' );
+const setMetadata = require( './middlewares/metadata' );
+const handleErrors = require( './middlewares/error' );
+const cache = require( './middlewares/cache' );
+const cityRouter = require( './city/' );
+const municipalityRouter = require( './municipality/' );
 
 // Constant declaration
 
@@ -52,13 +52,13 @@ function addAppMiddelwares( app ) {
   app.use( handleErrors );
 }
 function initRouter() {
-  let router = new Router();
+  const router = new Router();
   addRouterMiddelwares( router );
 
   return router;
 }
 function initApplication() {
-  let app = new Koa();
+  const app = new Koa();
   app.name = 'UrbanScope';
   app.proxy = true;
 
@@ -68,7 +68,7 @@ function initApplication() {
   addAppMiddelwares( app );
 
   // Create router
-  let router = initRouter();
+  const router = initRouter();
 
   // Enable router
   app.use( router.routes() );
@@ -78,7 +78,7 @@ function initApplication() {
 // Module class declaration
 
 // Module initialization (at first load)
-let app = initApplication();
+const app = initApplication();
 
 
 

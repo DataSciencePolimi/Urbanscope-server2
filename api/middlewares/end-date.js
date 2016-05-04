@@ -2,9 +2,9 @@
 // Load system modules
 
 // Load modules
-let Boom = require( 'boom' );
-let moment = require( 'moment' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:end-date' );
+const Boom = require( 'boom' );
+const moment = require( 'moment' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:end-date' );
 
 // Load my modules
 
@@ -17,7 +17,7 @@ const DATE_FORMAT = require( '../../config/' ).dateFormat;
 function getEndDate( ctx, next ) {
   debug( 'Get end date' );
 
-  let qs = ctx.request.query;
+  const qs = ctx.request.query;
   let end = qs.endDate;
 
   // Use passed date or now
@@ -28,7 +28,7 @@ function getEndDate( ctx, next ) {
   }
 
   if( !end.isValid() ) {
-    let message = 'Invalid "endDate" format, please stick to '+DATE_FORMAT;
+    const message = 'Invalid "endDate" format, please stick to '+DATE_FORMAT;
     throw Boom.badRequest( message );
   }
 

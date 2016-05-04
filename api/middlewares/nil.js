@@ -2,9 +2,9 @@
 // Load system modules
 
 // Load modules
-let _ = require( 'lodash' );
-let Boom = require( 'boom' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:nils' );
+const _ = require( 'lodash' );
+const Boom = require( 'boom' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:nils' );
 
 // Load my modules
 
@@ -18,8 +18,8 @@ const DEFAULT_NIL = _( NILS ).map( 'properties.ID_NIL' ).first();
 function getParam( ctx ) {
   debug( 'Get nil param' );
 
-  let qs = ctx.request.query;
-  let nil = qs.nil_ID;
+  const qs = ctx.request.query;
+  const nil = qs.nil_ID;
 
   return nil;
 }
@@ -35,7 +35,7 @@ function getNils( ctx, next ) {
     .map( nil=> parseInt( nil, 10 ) );
 
     // Check each nil
-    for( let nil of nils ) {
+    for( const nil of nils ) {
       if( isNaN( nil ) || nil<=0 ) {
         throw Boom.badRequest( `NIL "${nil}" not a positive number` );
       }
@@ -51,7 +51,7 @@ function getNils( ctx, next ) {
 function getNil( ctx, next ) {
   debug( 'Get nil' );
 
-  let nil = getParam( ctx ) || DEFAULT_NIL;
+  const nil = getParam( ctx ) || DEFAULT_NIL;
 
   ctx.nil = Number( nil );
 
