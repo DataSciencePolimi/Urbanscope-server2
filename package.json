@@ -8,7 +8,7 @@
     "server": "node server.js",
     "nodemon": "nodemon server.js",
     "lint": "eslint --fix .",
-    "start": "npm run lint && npm run server"
+    "start": "npm run server"
   },
   "author": "Volox",
   "license": "MIT",
