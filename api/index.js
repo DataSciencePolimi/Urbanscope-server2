@@ -5,6 +5,7 @@
 const Koa = require( 'koa' );
 const Router = require( 'koa-router' );
 // const helmet = require( 'koa-helmet' );
+const cors = require('kcors');
 const debug = require( 'debug' )( 'UrbanScope:server:api' );
 
 // Load my modules
@@ -19,6 +20,9 @@ const municipalityRouter = require( './municipality/' );
 // Module variables declaration
 
 // Module functions declaration
+function addCors( router ) {
+  router.use( cors() );
+}
 function addHelmet( router ) {
   // Secure endpoint
   // router.use( helmet.csp() );
@@ -33,6 +37,7 @@ function addHelmet( router ) {
   // router.use( helmet.xssFilter() );
 }
 function addRouterMiddelwares( router ) {
+  addCors( router );
   addHelmet( router );
   // Add metadata to the request
   router.use( setMetadata );

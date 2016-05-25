@@ -6,21 +6,20 @@ const co = require( 'co' );
 const _ = require( 'lodash' );
 const Boom = require( 'boom' );
 const moment = require( 'moment' );
-const debug = require( 'debug' )( 'UrbanScope:server:api:municipality:anomalies:district' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:city:anomalies:top2' );
 
 // Load my modules
-const getAnomalies = require( '../../../utils/get-anomalies' );
-const getTime = require( '../../../utils/time' );
+const getAnomalies = require( '../../../utils/get-anomalies2' );
 
 // Constant declaration
 const DATE_FORMAT = require( '../../../config/' ).dateFormat;
-const MUNICIPALITIES = require( '../../../config/milan_municipalities.json' );
+const NILS = require( '../../../config/milan_nils.json' );
 const CACHE_MAX_AGE = 60*60*24; // 1 dd
 
 // Module variables declaration
 
 // Module functions declaration
-function* district( ctx ) {
+function* topDistrict( ctx ) {
   // Cache MAX_AGE
   ctx.maxAge = Infinity; // We can store past values forever
 
@@ -28,6 +27,7 @@ function* district( ctx ) {
 
   const start = ctx.startDate;
   const end = ctx.endDate;
+  const limit = ctx.limit;
   const language = ctx.language;
 
 
@@ -39,8 +39,8 @@ function* district( ctx ) {
     startDate: start.format( DATE_FORMAT ),
     endDate: end.format( DATE_FORMAT ),
     lang: language,
+    limit: limit,
   };
-
 
   if( moment().isBetween( start, end ) ) {
     // We cannot store the values forever, since we are in the timespan
@@ -50,55 +50,38 @@ function* district( ctx ) {
 
   // Create query filter
   const filter = {
-    source: 'twitter',
-    timestamp: {
-      $gte: start.toDate().getTime(),
-      $lte: end.toDate().getTime(),
+    year: {
+      $gte: start.year(),
+      $lte: end.year(),
+    },
+    month: {
+      $gte: start.month() + 1,
+      $lte: end.month() + 1,
     },
     lang: { $nin: [ 'und', null ] },
-    // nil: { $nin: [ NaN, null ] },
   };
 
-  const allMunicipalities = _.map( MUNICIPALITIES, 'properties.PRO_COM' );
-
-  // Get anomalies
-  debug( 'Requesting anomalies' );
-  const anomalyTimes = {};
-  let startTime = getTime();
-  const anomalies = yield getAnomalies( filter, language, 'municipality', anomalyTimes );
-  let ms = getTime( startTime );
-  ctx.metadata.anomalies = anomalyTimes;
-  ctx.metadata.query = ms;
-  debug( 'Requesting anomalies COMPLETED in %d ms', ms );
+  const allNils = _.map( NILS, 'properties.ID_NIL' );
 
 
-  debug( 'Data elaboration' );
-  startTime = getTime();
+  const anomalies = yield getAnomalies( filter, 'nil', language );
 
   // Get above threshold
-  const above = _( anomalies )
-  .map( 'municipality_id' )
-  .value();
+  const above = _.map( anomalies, 'nil_id' );
   response.nonTransparent = above;
 
   // Get below threshold
-  const below = _( allMunicipalities )
-  .difference( above )
-  .value();
+  const below = _.difference( allNils, above );
   response.belowThreshold = below;
 
   // Count by type
   response.counts = _.countBy( anomalies, 'type' );
 
-  // Get province anomalies
-  const provinceData = _( anomalies )
+  // Get nil anomalies
+  response.top = _( anomalies )
+  .orderBy( 'value', 'desc' )
+  .take( limit )
   .value();
-  response.provinces = provinceData;
-
-
-  ms = getTime( startTime );
-  ctx.metadata.elaboration = ms;
-  debug( 'Data elaboration COMPLETED in %d ms', ms );
 
   // Set response
   ctx.body = response;
@@ -108,7 +91,7 @@ function* district( ctx ) {
 // Module initialization (at first load)
 
 // Module exports
-module.exports = co.wrap( district );
+module.exports = co.wrap( topDistrict );
 
 
 //  50 6F 77 65 72 65 64  62 79  56 6F 6C 6F 78

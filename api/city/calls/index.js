@@ -35,7 +35,7 @@ const router = new Router();
 router.get( '/district', compose( [
   dates,
   callType,
-  parseNil( true )
+  parseNil( true ),
 ] ), district );
 router.get( '/timeline', dates, timeline );
 router.get( '/list', compose( [

@@ -33,6 +33,8 @@ node_modules
 deploy
 
 # Do not sync config files
+config/mongo.json
+config/redis.json
 
 ### SublimeText project files
 *.sublime-workspace

@@ -6,7 +6,9 @@
   "scripts": {
     "test": "mocha --recursive",
     "server": "node server.js",
-    "nodemon": "nodemon server.js"
+    "nodemon": "nodemon server.js",
+    "lint": "eslint --fix .",
+    "start": "npm run lint && npm run server"
   },
   "author": "Volox",
   "license": "MIT",
@@ -17,6 +19,7 @@
     "db-utils": "volox/node-db-utils",
     "debug": "2.x",
     "ioredis": "1.x",
+    "kcors": "^2.1.0",
     "koa": "^2.0.0-alpha.3",
     "koa-compose": "3.x",
     "koa-helmet": "1.x",
@@ -30,6 +33,7 @@
   "devDependencies": {
     "chai": "*",
     "del": "*",
+    "eslint": "^2.9.0",
     "eslint-config-volox": "*",
     "gulp": "*",
     "gulp-json-editor": "*",

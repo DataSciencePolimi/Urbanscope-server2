@@ -2,15 +2,15 @@
 // Load system modules
 
 // Load modules
-let co = require( 'co' );
-let _ = require( 'lodash' );
-let Boom = require( 'boom' );
-let moment = require( 'moment' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:municipality:anomalies:top' );
+const co = require( 'co' );
+const _ = require( 'lodash' );
+const Boom = require( 'boom' );
+const moment = require( 'moment' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:municipality:anomalies:top' );
 
 // Load my modules
-let getAnomalies = require( '../../../utils/get-anomalies' );
-let getTime = require( '../../../utils/time' );
+const getAnomalies = require( '../../../utils/get-anomalies' );
+const getTime = require( '../../../utils/time' );
 
 // Constant declaration
 const DATE_FORMAT = require( '../../../config/' ).dateFormat;
@@ -26,17 +26,17 @@ function* district( ctx ) {
 
   debug( 'Requested district' );
 
-  let start = ctx.startDate;
-  let end = ctx.endDate;
-  let limit = ctx.limit;
-  let language = ctx.language;
+  const start = ctx.startDate;
+  const end = ctx.endDate;
+  const limit = ctx.limit;
+  const language = ctx.language;
 
 
   if( start.isAfter( end ) ) {
     throw Boom.badRequest( 'Start date after end date' );
   }
 
-  let response = {
+  const response = {
     startDate: start.format( DATE_FORMAT ),
     endDate: end.format( DATE_FORMAT ),
     lang: language,
@@ -51,7 +51,7 @@ function* district( ctx ) {
 
 
   // Create query filter
-  let filter = {
+  const filter = {
     source: 'twitter',
     timestamp: {
       $gte: start.toDate().getTime(),
@@ -63,9 +63,9 @@ function* district( ctx ) {
 
   // Get anomalies
   debug( 'Requesting anomalies' );
-  let anomalyTimes = {};
+  const anomalyTimes = {};
   let startTime = getTime();
-  let anomalies = yield getAnomalies( filter, language, 'municipality', anomalyTimes );
+  const anomalies = yield getAnomalies( filter, language, 'municipality', anomalyTimes );
   let ms = getTime( startTime );
   ctx.metadata.anomalies = anomalyTimes;
   ctx.metadata.query = ms;
@@ -76,13 +76,13 @@ function* district( ctx ) {
   startTime = getTime();
 
   // Get above threshold
-  let above = _( anomalies )
+  const above = _( anomalies )
   .map( 'municipality_id' )
   .value();
   response.nonTransparent = above;
 
   // Get below threshold
-  let below = _( MUNICIPALITIES )
+  const below = _( MUNICIPALITIES )
   .map( 'properties.PRO_COM' )
   .difference( above )
   .value();
@@ -92,7 +92,7 @@ function* district( ctx ) {
   response.counts = _.countBy( anomalies, 'type' );
 
   // Get nil anomalies
-  let top = _( anomalies )
+  const top = _( anomalies )
   .orderBy( 'value', 'desc' )
   .take( limit )
   .value();

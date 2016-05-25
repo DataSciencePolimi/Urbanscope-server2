@@ -2,14 +2,14 @@
 // Load system modules
 
 // Load modules
-let co = require( 'co' );
-let _ = require( 'lodash' );
-let Boom = require( 'boom' );
-let db = require( 'db-utils' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:municipality:tweets:district' );
+const co = require( 'co' );
+const _ = require( 'lodash' );
+const Boom = require( 'boom' );
+const db = require( 'db-utils' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:municipality:tweets:district' );
 
 // Load my modules
-let getTime = require( '../../../utils/time' );
+const getTime = require( '../../../utils/time' );
 
 // Constant declaration
 const COLLECTION = 'posts';
@@ -21,22 +21,22 @@ const CACHE_MAX_AGE = 60*60*24*1; // 1 dd
 
 // Module functions declaration
 function getAction( municipality, filter, municipalityQueryTimes ) {
-  let query = _.assign( {}, filter, {
+  const query = _.assign( {}, filter, {
     municipality: municipality,
   } );
 
-  let action = db.find( COLLECTION, query, {
+  const action = db.find( COLLECTION, query, {
     _id: 0,
     lang: 1,
   } );
 
   debug( 'Requesting actions for municipality %d', municipality );
-  let startTime = getTime();
+  const startTime = getTime();
   return action
   .hint( 'LanguageMunicipality' )
   .toArray()
   .tap( ()=> {
-    let ms = getTime( startTime );
+    const ms = getTime( startTime );
     municipalityQueryTimes[ municipality ] = ms;
     debug( 'municipality %d action COMPLETED in %d ms', municipality, ms )
   } );
@@ -47,17 +47,17 @@ function* district( ctx ) {
 
   debug( 'Requested district' );
 
-  let start = ctx.startDate;
-  let end = ctx.endDate;
-  let language = ctx.language;
-  let municipalities = ctx.municipalities;
+  const start = ctx.startDate;
+  const end = ctx.endDate;
+  const language = ctx.language;
+  const municipalities = ctx.municipalities;
 
 
   if( start.isAfter( end ) ) {
     throw Boom.badRequest( 'Start date after end date' );
   }
 
-  let response = {
+  const response = {
     startDate: start.format( DATE_FORMAT ),
     endDate: end.format( DATE_FORMAT ),
     language: language,
@@ -65,7 +65,7 @@ function* district( ctx ) {
 
 
   // Create query filter
-  let filter = {
+  const filter = {
     source: 'twitter',
     timestamp: {
       $gte: start.toDate().getTime(),
@@ -79,7 +79,7 @@ function* district( ctx ) {
   if( municipalities.length ) {
     selectedMunicipalities = municipalities;
   } else {
-    let allMunicipalities = _.map( MUNICIPALITIES, 'properties.PRO_COM' );
+    const allMunicipalities = _.map( MUNICIPALITIES, 'properties.PRO_COM' );
     selectedMunicipalities = allMunicipalities;
   }
 
@@ -93,9 +93,9 @@ function* district( ctx ) {
 
 
   // Start the query "actions"
-  let actions = {};
-  let municipalityQueryTimes = {};
-  for( let municipality of selectedMunicipalities ) {
+  const actions = {};
+  const municipalityQueryTimes = {};
+  for( const municipality of selectedMunicipalities ) {
     actions[ municipality ] = getAction( municipality, filter, municipalityQueryTimes );
   }
   ctx.metadata.nilQueryTimes = municipalityQueryTimes;
@@ -113,8 +113,8 @@ function* district( ctx ) {
   startTime = getTime();
   municipalityData = _( municipalityData )
   .map( ( data, municipality ) => {
-    let languages = _.countBy( data, 'lang' );
-    let value = _( languages ).map().sum();
+    const languages = _.countBy( data, 'lang' );
+    const value = _( languages ).map().sum();
 
     return {
       value: value,

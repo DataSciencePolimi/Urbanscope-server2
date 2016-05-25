@@ -2,11 +2,11 @@
 // Load system modules
 
 // Load modules
-let Router = require( 'koa-router' );
+const Router = require( 'koa-router' );
 
 // Load my modules
-let tweets = require( './tweets' );
-let anomalies = require( './anomalies' );
+const tweets = require( './tweets' );
+const anomalies = require( './anomalies' );
 
 // Constant declaration
 
@@ -17,7 +17,7 @@ let anomalies = require( './anomalies' );
 // Module class declaration
 
 // Module initialization (at first load)
-let router = new Router();
+const router = new Router();
 router.use( '/tweets', tweets.routes() );
 router.use( '/anomaly', anomalies.routes() );
 

@@ -2,14 +2,14 @@
 // Load system modules
 
 // Load modules
-let co = require( 'co' );
-let _ = require( 'lodash' );
-let Boom = require( 'boom' );
-let db = require( 'db-utils' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:municipality:tweets:text' );
+const co = require( 'co' );
+const _ = require( 'lodash' );
+const Boom = require( 'boom' );
+const db = require( 'db-utils' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:municipality:tweets:text' );
 
 // Load my modules
-let getTime = require( '../../../utils/time' );
+const getTime = require( '../../../utils/time' );
 
 // Constant declaration
 const COLLECTION = 'posts';
@@ -22,21 +22,21 @@ function* getTweetsText( ctx ) {
   debug( 'Requested text' );
 
   // Special parse language
-  let qs = ctx.request.query;
+  const qs = ctx.request.query;
   let lang = qs.lang || 'it';
   lang = lang.toLowerCase();
 
-  let start = ctx.startDate;
-  let end = ctx.endDate;
-  let limit = ctx.limit;
-  let municipality = ctx.municipality;
+  const start = ctx.startDate;
+  const end = ctx.endDate;
+  const limit = ctx.limit;
+  const municipality = ctx.municipality;
 
 
   if( start.isAfter( end ) ) {
     throw Boom.badRequest( 'Start date after end date' );
   }
 
-  let response = {
+  const response = {
     startDate: start.format( DATE_FORMAT ),
     endDate: end.format( DATE_FORMAT ),
     municipality: municipality,
@@ -46,7 +46,7 @@ function* getTweetsText( ctx ) {
 
 
   // Create query filter
-  let filter = {
+  const filter = {
     source: 'twitter',
     timestamp: {
       $gte: start.toDate().getTime(),

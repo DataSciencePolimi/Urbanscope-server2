@@ -74,7 +74,7 @@ function* total( ctx ) {
       countries: {
         $push: '$$ROOT',
       },
-    }
+    },
   } );
   // Rename the fields
   pipeline.push( {
@@ -82,7 +82,7 @@ function* total( ctx ) {
       _id: 0,
       date: '$_id',
       countries: 1,
-    }
+    },
   } );
 
   // Start the pipeline

@@ -83,7 +83,7 @@ function getData( type, id, filter, times ) {
   .tap( () => {
     const ms = getTime( startTime );
     times[ id ] = ms;
-    debug( 'Requesting data for %s[%s] COMPconstED in %d ms', type, id, ms );
+    debug( 'Requesting data for %s[%s] COMPLETED in %d ms', type, id, ms );
   } );
 }
 function getAnomalies( filter, language, type, profile ) {
@@ -115,7 +115,7 @@ function getAnomalies( filter, language, type, profile ) {
   .tap( () => {
     const ms = getTime( queryTime );
     profile.query = ms;
-    debug( 'Requesting actions COMPconstED in %d ms', ms );
+    debug( 'Requesting actions COMPLETED in %d ms', ms );
 
     debug( 'Data elaboration' );
     elaborationTime = getTime();
@@ -145,7 +145,7 @@ function getAnomalies( filter, language, type, profile ) {
   .tap( () => {
     const ms = getTime( elaborationTime );
     profile.elaboration = ms;
-    debug( 'Data elaboration COMPconstED in %d ms', ms );
+    debug( 'Data elaboration COMPLETED in %d ms', ms );
   } )
   ;
 }

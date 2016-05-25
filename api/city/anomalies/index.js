@@ -11,8 +11,9 @@ const endDate = require( '../../middlewares/end-date' );
 const language = require( '../../middlewares/language' );
 const limit = require( '../../middlewares/limit' );
 const district = require( './district' );
+const district2 = require( './district2' );
 const top = require( './top' );
-const test = require( './test' );
+const top2 = require( './top2' );
 
 // Constant declaration
 
@@ -31,15 +32,22 @@ const router = new Router();
 router.get( '/district', compose( [
   dates,
   language,
-] ), district );
+] ), district2 );
 router.get( '/top', compose( [
   dates,
   limit,
   language,
-] ), top );
-router.get( '/test', compose( [
+] ), top2 );
+
+router.get( '/district2', compose( [
+  dates,
   language,
-] ), test );
+] ), district2 );
+router.get( '/top2', compose( [
+  dates,
+  limit,
+  language,
+] ), top2 );
 
 // Module exports
 module.exports = router;

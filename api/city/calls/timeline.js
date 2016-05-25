@@ -56,7 +56,7 @@ function* timeline( ctx ) {
       },
       in: { $sum: { $add: '$callIn' } },
       out: { $sum: { $add: '$callOut' } },
-    }
+    },
   } );
 
   // Start the pipeline

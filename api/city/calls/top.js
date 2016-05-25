@@ -58,13 +58,13 @@ function* top( ctx ) {
       in: { $sum: { $add: '$callIn' } },
       out: { $sum: { $add: '$callOut' } },
       total: { $sum: { $add: [ '$callOut', '$callIn' ] } },
-    }
+    },
   } );
   // Sort by the specified field
   pipeline.push( {
     $sort: {
-      [orderBy]: -1
-    }
+      [orderBy]: -1,
+    },
   } );
   // Limit the results
   pipeline.push( {

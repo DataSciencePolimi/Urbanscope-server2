@@ -13,8 +13,9 @@ const language = require( '../../middlewares/language' );
 const limit = require( '../../middlewares/limit' );
 const district = require( './district' );
 const timeline = require( './timeline' );
+const district2 = require( './district2' );
+const timeline2 = require( './timeline2' );
 const text = require( './text' );
-const test = require( './test' );
 
 // Constant declaration
 
@@ -34,20 +35,26 @@ router.get( '/district', compose( [
   dates,
   language,
   parseNil( true ),
-] ), district );
+] ), district2 );
 router.get( '/timeline', compose( [
   dates,
   language,
-] ), timeline );
+] ), timeline2 );
 router.get( '/text', compose( [
   dates,
   limit,
   parseNil( false ),
 ] ), text );
-router.get( '/test', compose( [
+
+router.get( '/timeline2', compose( [
   dates,
   language,
-] ), test );
+] ), timeline2 );
+router.get( '/district2', compose( [
+  dates,
+  language,
+  parseNil( true ),
+] ), district2 );
 
 // Module exports
 module.exports = router;

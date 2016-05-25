@@ -2,15 +2,15 @@
 // Load system modules
 
 // Load modules
-let co = require( 'co' );
-let _ = require( 'lodash' );
-let Boom = require( 'boom' );
-let db = require( 'db-utils' );
-let moment = require( 'moment' );
-let debug = require( 'debug' )( 'UrbanScope:server:api:municipality:tweets:timeline' );
+const co = require( 'co' );
+const _ = require( 'lodash' );
+const Boom = require( 'boom' );
+const db = require( 'db-utils' );
+const moment = require( 'moment' );
+const debug = require( 'debug' )( 'UrbanScope:server:api:municipality:tweets:timeline' );
 
 // Load my modules
-let getTime = require( '../../../utils/time' );
+const getTime = require( '../../../utils/time' );
 
 // Constant declaration
 const COLLECTION = 'posts';
@@ -22,24 +22,24 @@ const CACHE_MAX_AGE = 60*60*24*10; // 10 dd
 
 // Module functions declaration
 function getTweetsPerMonth( collectionName, year, month, filter, monthQueryTimes ) {
-  let start = moment.utc( { year, month } ).startOf( 'month' );
-  let end = moment.utc( { year, month } ).endOf( 'month' );
+  const start = moment.utc( { year, month } ).startOf( 'month' );
+  const end = moment.utc( { year, month } ).endOf( 'month' );
 
-  let query = _.assign( {}, filter, {
+  const query = _.assign( {}, filter, {
     timestamp: {
       $gte: start.toDate().getTime(),
       $lte: end.toDate().getTime(),
-    }
+    },
   } );
 
   debug( 'Requesting count for %d-%d', year, month );
-  let startTime = getTime();
+  const startTime = getTime();
   return db
   .find( collectionName, query )
   .hint( 'Timestamp' )
   .count()
   .tap( ()=> {
-    let ms = getTime( startTime );
+    const ms = getTime( startTime );
     monthQueryTimes[ `${year}-${month+1}` ] = ms;
     debug( 'Request for %d-%d COMPLETED in %d ms', year, month, ms );
   } )
@@ -51,16 +51,16 @@ function* getTimeline( ctx ) {
 
   debug( 'Requested timeline' );
 
-  let start = ctx.startDate;
-  let end = ctx.endDate;
-  let language = ctx.language;
+  const start = ctx.startDate;
+  const end = ctx.endDate;
+  const language = ctx.language;
 
 
   if( start.isAfter( end ) ) {
     throw Boom.badRequest( 'Start date after end date' );
   }
 
-  let response = {
+  const response = {
     startDate: start.format( DATE_FORMAT ),
     endDate: end.format( DATE_FORMAT ),
     lang: language,
@@ -68,7 +68,7 @@ function* getTimeline( ctx ) {
 
 
   // Create query filter
-  let filter = {
+  const filter = {
     source: 'twitter',
     municipality: { $ne: null },
   };
@@ -81,17 +81,17 @@ function* getTimeline( ctx ) {
     };
   }
 
-  let actions = {};
+  const actions = {};
 
   // For each month count the tweets
-  let monthQueryTimes = {};
-  let startDate = start.clone();
+  const monthQueryTimes = {};
+  const startDate = start.clone();
   while( startDate.isBefore( end ) ) {
-    let month = startDate.month();
-    let year = startDate.year();
+    const month = startDate.month();
+    const year = startDate.year();
 
     debug( 'Get tweets count for %d-%d', year, month+1 );
-    let key = startDate.format( OUT_DATE_FORMAT );
+    const key = startDate.format( OUT_DATE_FORMAT );
     actions[ key ] = getTweetsPerMonth( COLLECTION, year, month, filter, monthQueryTimes );
 
     startDate.add( 1, 'month' );
@@ -100,7 +100,7 @@ function* getTimeline( ctx ) {
 
   debug( 'Requesting actions' );
   let startTime = getTime();
-  let responses = yield actions;
+  const responses = yield actions;
   let ms = getTime( startTime );
   ctx.metadata.query = ms;
   debug( 'Requesting actions COMPLETED in %d ms', ms );
@@ -108,7 +108,7 @@ function* getTimeline( ctx ) {
 
   debug( 'Data elaboration' );
   startTime = getTime();
-  let timeline = _.map( responses, ( count, date ) => {
+  const timeline = _.map( responses, ( count, date ) => {
     return {
       date,
       value: count,

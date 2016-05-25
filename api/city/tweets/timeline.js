@@ -29,7 +29,7 @@ function getTweetsPerMonth( collectionName, year, month, filter, monthQueryTimes
     timestamp: {
       $gte: start.toDate().getTime(),
       $lte: end.toDate().getTime(),
-    }
+    },
   } );
 
   debug( 'Requesting count for %d-%d', year, month, query );
