@@ -9,11 +9,13 @@ const db = require( 'db-utils' );
 const debug = require( 'debug' )( 'UrbanScope:server:api:city:tweets:timeline2' );
 
 // Load my modules
+const getDateBetween = require( '../../../utils/get-between' );
 
 // Constant declaration
 const DATE_FORMAT = require( '../../../config/' ).dateFormat;
 const CACHE_MAX_AGE = 60*60*24*1; // 1 dd
 const TIMELINE = 'timeline';
+const OUT_DATE_FORMAT = 'YYYY-MM';
 
 // Module variables declaration
 
@@ -22,7 +24,7 @@ function formatTimelineData( timeline ) {
 
   return _( timeline )
   .map( e => {
-    const month = e.month>9 ? ' '+e.month : e.month;
+    const month = e.month < 10 ? '0'+e.month : e.month;
     return {
       date: `${e.year}-${month}`,
       value: e.value,
@@ -76,15 +78,8 @@ function* getTimeline( ctx ) {
   const filter = {
     lang: language,
     type: 'nil',
-    year: {
-      $gte: start.year(),
-      $lte: end.year(),
-    },
-    month: {
-      $gte: start.month() + 1,
-      $lte: end.month() + 1,
-    },
   };
+  filter.$or = getDateBetween( start, end );
 
   // Filter by language
   if( language==='other' ) {
@@ -95,7 +90,26 @@ function* getTimeline( ctx ) {
 
   const timelineData = yield getTimelineData( filter );
 
-  response.timeline = timelineData;
+  // Check that all months are present
+  const startDate = start.clone();
+  while( startDate.isBefore( end ) ) {
+    const month = startDate.month();
+    const year = startDate.year();
+
+    debug( 'Get tweets count for %d-%d', year, month+1 );
+    const date = startDate.format( OUT_DATE_FORMAT );
+    if( !_.find( timelineData, { date: date } ) ) {
+      // Fill gap
+      timelineData.push( {
+        date: date,
+        value: 0,
+      } )
+    }
+
+    startDate.add( 1, 'month' );
+  }
+
+  response.timeline = _.orderBy( timelineData, 'date' );
 
   // Set response
   ctx.body = response;

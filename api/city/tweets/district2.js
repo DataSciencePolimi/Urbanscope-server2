@@ -9,6 +9,7 @@ const db = require( 'db-utils' );
 const debug = require( 'debug' )( 'UrbanScope:server:api:city:tweets:district2' );
 
 // Load my modules
+const getDateBetween = require( '../../../utils/get-between' );
 
 // Constant declaration
 const DATE_FORMAT = require( '../../../config/' ).dateFormat;
@@ -30,7 +31,7 @@ function formatTimelineData( timeline ) {
   } )
   .map( ( v, k ) => {
     return {
-      nil_id: Number( k ),
+      'nil_id': Number( k ),
       value: _( v ).map().sumBy(),
       langs: v,
     };
@@ -78,15 +79,8 @@ function* district( ctx ) {
   const filter = {
     lang: language,
     type: 'nil',
-    year: {
-      $gte: start.year(),
-      $lte: end.year(),
-    },
-    month: {
-      $gte: start.month() + 1,
-      $lte: end.month() + 1,
-    },
   };
+  filter.$or = getDateBetween( start, end );
 
 
   // Filter by language
@@ -107,7 +101,7 @@ function* district( ctx ) {
 
   const data = yield getTimelineData( filter );
 
-  response.selectedNils = filter.nil[ '$in' ];
+  response.selectedNils = filter.id[ '$in' ];
   response.nils = data;
 
   // Set response

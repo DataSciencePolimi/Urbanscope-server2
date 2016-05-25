@@ -10,6 +10,7 @@ const debug = require( 'debug' )( 'UrbanScope:server:api:city:anomalies:top2' );
 
 // Load my modules
 const getAnomalies = require( '../../../utils/get-anomalies2' );
+const getDateBetween = require( '../../../utils/get-between' );
 
 // Constant declaration
 const DATE_FORMAT = require( '../../../config/' ).dateFormat;
@@ -50,16 +51,9 @@ function* topDistrict( ctx ) {
 
   // Create query filter
   const filter = {
-    year: {
-      $gte: start.year(),
-      $lte: end.year(),
-    },
-    month: {
-      $gte: start.month() + 1,
-      $lte: end.month() + 1,
-    },
     lang: { $nin: [ 'und', null ] },
   };
+  filter.$or = getDateBetween( start, end );
 
   const allNils = _.map( NILS, 'properties.ID_NIL' );
 
