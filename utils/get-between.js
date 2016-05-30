@@ -23,11 +23,11 @@ function getDateBetween( start, end ) {
     } );
     conditions.push( {
       year: start.year(),
-      month: { $gt: start.month() + 1 },
+      month: { $gte: start.month() + 1 },
     } );
     conditions.push( {
       year: end.year(),
-      month: { $lt: end.month() + 1 },
+      month: { $lte: end.month() + 1 },
     } );
   } else {
     conditions.push( {

@@ -9,7 +9,7 @@ const debug = require( 'debug' )( 'UrbanScope:server:api:middlewares:cache' );
 
 // Constant declaration
 const MAX_AGE = 60*30; // 5 min
-const PREFIX = 'cache:'; // 5 min
+const PREFIX = 'cache:';
 
 // Module variables declaration
 
