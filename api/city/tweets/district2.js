@@ -31,7 +31,7 @@ function formatTimelineData( timeline ) {
   } )
   .map( ( v, k ) => {
     return {
-      'nil_id': Number( k ),
+      nil: Number( k ),
       value: _( v ).map().sumBy(),
       langs: v,
     };
