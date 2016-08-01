@@ -33,6 +33,7 @@ node_modules
 deploy
 
 # Do not sync config files
+.vscode
 config/mongo.json
 config/redis.json
 

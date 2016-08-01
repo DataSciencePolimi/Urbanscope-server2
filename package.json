@@ -5,8 +5,8 @@
   "description": "UrbanScope server",
   "scripts": {
     "test": "mocha --recursive",
-    "server": "node server.js",
-    "nodemon": "nodemon server.js",
+    "server": "DEBUG=UrbanScope:* node server.js",
+    "nodemon": "DEBUG=UrbanScope:* nodemon server.js",
     "lint": "eslint --fix .",
     "start": "npm run server"
   },
