@@ -6,7 +6,7 @@ let db = require( 'db-utils' );
 
 // Const
 const MONGO = require( '../config/mongo.json' );
-const INDEXES = require( '../config/mongo_indexes.json' );
+const INDEXES = require( '../config/mongo-indexes.json' );
 const MONGO_URL = MONGO.url;
 const MONGO_DB = 'UrbanScopeTest';
 const COLLECTIONS = MONGO.collections;

@@ -25,7 +25,7 @@ describe( 'City', function() {
 
 
     // District
-    describe( 'district', function() {
+    describe.skip( 'district', function() {
 
       it( `should return 1 tweet for lang(${LANG_IT}) and NIL(${NIL_1})`, function( done ) {
         request( app )
@@ -255,7 +255,7 @@ describe( 'City', function() {
 
 
     // Timeline
-    describe( 'timeline', function() {
+    describe.skip( 'timeline', function() {
 
       it( `should get correct montly counts for lang(${LANG_IT})`, function( done ) {
         request( app )
