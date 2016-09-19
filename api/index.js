@@ -5,7 +5,7 @@
 const Koa = require( 'koa' );
 const Router = require( 'koa-router' );
 // const helmet = require( 'koa-helmet' );
-const cors = require('kcors');
+const cors = require( 'kcors' );
 const debug = require( 'debug' )( 'UrbanScope:server:api' );
 
 // Load my modules
@@ -43,7 +43,7 @@ function addRouterMiddelwares( router ) {
   router.use( setMetadata );
 
   // Enable cache or not
-  if( process.env.NODE_ENV==='production' ) {
+  if( process.env.NODE_ENV === 'production' ) {
     router.use( '/city', cache(), cityRouter.routes() );
     router.use( '/municipality', cache(), municipalityRouter.routes() );
   } else {
