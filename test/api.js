@@ -81,7 +81,7 @@ describe( 'API', function() {
 
   } );
 
-  describe( 'Municipality', function() {
+  describe.skip( 'Municipality', function() {
 
     it( 'should return 200 and JSON', function( done ) {
       request( app )
