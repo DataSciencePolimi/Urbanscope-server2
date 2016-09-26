@@ -48,9 +48,7 @@ function* top( ctx ) {
   // Get the calls
   const pipeline = [];
   // Add filter
-  pipeline.push( {
-    $match: filter,
-  } );
+  pipeline.push( { $match: filter } );
   // Add grouping by year-month
   pipeline.push( {
     $group: {
@@ -61,15 +59,9 @@ function* top( ctx ) {
     },
   } );
   // Sort by the specified field
-  pipeline.push( {
-    $sort: {
-      [orderBy]: -1,
-    },
-  } );
+  pipeline.push( { $sort: { [ orderBy ]: -1 } } );
   // Limit the results
-  pipeline.push( {
-    $limit: limit,
-  } );
+  pipeline.push( { $limit: limit } );
   // Rename "_id"
   pipeline.push( {
     $project: {
