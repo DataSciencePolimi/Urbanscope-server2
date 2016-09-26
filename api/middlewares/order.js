@@ -30,7 +30,7 @@ function getOrder( ctx, next ) {
     throw Boom.badRequest( message );
   }
 
-  debug( 'Order by is: %s', ctx.orderBy );
+  debug( 'Order by is: %s', orderBy );
   ctx.orderBy = orderBy;
 
   return next();
