@@ -31,7 +31,7 @@ function formatTimelineData( timeline ) {
   } )
   .map( ( v, k ) => {
     return {
-      nil: Number( k ),
+      municipality: Number( k ),
       value: _( v ).map().sumBy(),
       langs: v,
     };
@@ -61,7 +61,7 @@ function* district( ctx ) {
   const start = ctx.startDate;
   const end = ctx.endDate;
   const language = ctx.language;
-  const nils = ctx.nils;
+  const municipalities = ctx.municipalities;
 
 
   if( start.isAfter( end ) ) {
@@ -91,18 +91,18 @@ function* district( ctx ) {
   }
 
 
-  // Add selected nils property to the response
-  if( nils.length>0 ) {
-    filter.id = { $in: nils };
+  // Add selected municipalities property to the response
+  if( municipalities.length>0 ) {
+    filter.id = { $in: municipalities };
   } else {
-    const allNils = _.map( MUNICIPALITIES, 'properties.PRO_COM' );
-    filter.id = { $in: allNils };
+    const allMunicipalities = _.map( MUNICIPALITIES, 'properties.PRO_COM' );
+    filter.id = { $in: allMunicipalities };
   }
 
   const data = yield getTimelineData( filter );
 
-  response.selectedNils = filter.id[ '$in' ];
-  response.nils = data;
+  response.selectedMunicipalities = filter.id[ '$in' ];
+  response.municipalities = data;
 
   // Set response
   ctx.body = response;
